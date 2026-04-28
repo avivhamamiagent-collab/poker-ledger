@@ -12,7 +12,7 @@ import { useStore } from '../../store-context'
 export function GroupsPage() {
   const store = useStore()
   const { groups, loading, error, refresh } = useGroups()
-  const { toast } = useToast()
+  const toast = useToast()
 
   const [invites, setInvites] = React.useState<GroupInvite[]>([])
   const [invLoading, setInvLoading] = React.useState(true)
@@ -39,9 +39,9 @@ export function GroupsPage() {
       await store.createGroup(name.trim())
       setName('')
       await refresh()
-      toast({ title: 'Group created' })
+      toast.push({ title: 'Group created' })
     } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Failed to create group', description: String(err?.message ?? err) })
+      toast.push({ title: 'Failed to create group', description: String(err?.message ?? err) })
     } finally {
       setCreating(false)
     }
@@ -51,9 +51,9 @@ export function GroupsPage() {
     try {
       await store.respondToInvite(inviteId, status)
       await Promise.all([refresh(), loadInvites()])
-      toast({ title: status === 'accepted' ? 'Joined group' : 'Invite declined' })
+      toast.push({ title: status === 'accepted' ? 'Joined group' : 'Invite declined' })
     } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Failed', description: String(err?.message ?? err) })
+      toast.push({ title: 'Failed', description: String(err?.message ?? err) })
     }
   }
 

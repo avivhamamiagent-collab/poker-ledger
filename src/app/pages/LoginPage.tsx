@@ -11,7 +11,7 @@ import { useAuth } from '../auth/auth-context'
 export function LoginPage() {
   const { user, enabled } = useAuth()
   const navigate = useNavigate()
-  const { toast } = useToast()
+  const toast = useToast()
 
   const [email, setEmail] = React.useState('')
   const [loading, setLoading] = React.useState(false)
@@ -31,10 +31,10 @@ export function LoginPage() {
         options: { emailRedirectTo: redirectTo },
       })
       if (error) throw error
-      toast({ title: 'Check your email', description: 'We sent you a magic link to sign in.' })
+      toast.push({ title: 'Check your email', description: 'We sent you a magic link to sign in.' })
       setEmail('')
     } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Sign in failed', description: String(err?.message ?? err) })
+      toast.push({ title: 'Sign in failed', description: String(err?.message ?? err) })
     } finally {
       setLoading(false)
     }

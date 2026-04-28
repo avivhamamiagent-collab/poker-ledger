@@ -8,7 +8,7 @@ import { useStore } from '../store-context'
 export function NotificationsPage() {
   const store = useStore()
   const { items, loading, error, refresh } = useNotifications()
-  const { toast } = useToast()
+  const toast = useToast()
   const push = useWebPush()
 
   async function markRead(id: string) {
@@ -16,16 +16,16 @@ export function NotificationsPage() {
       await store.markNotificationRead(id)
       await refresh()
     } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Failed', description: String(err?.message ?? err) })
+      toast.push({ title: 'Failed', description: String(err?.message ?? err) })
     }
   }
 
   async function enablePush() {
     try {
       await push.enable()
-      toast({ title: 'Push enabled', description: 'You’ll get notifications for invites and new games.' })
+      toast.push({ title: 'Push enabled', description: 'You’ll get notifications for invites and new games.' })
     } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Push setup failed', description: String(err?.message ?? err) })
+      toast.push({ title: 'Push setup failed', description: String(err?.message ?? err) })
     }
   }
 

@@ -4,10 +4,10 @@ Production-ready, mobile-first web app for tracking a poker night ledger (ILS).
 
 - **UI:** Tailwind + shadcn-style components (Radix primitives)
 - **Routing:** React Router
-- **Storage:** Local IndexedDB (default) behind an interface; Supabase store scaffolded
+- **Storage:** Local IndexedDB (default) behind an interface; optional Supabase (auth + multi-user groups)
 
 ## Features
-- Sessions (one per poker night)
+- Sessions (ledger per poker night)
 - Players: name + optional phone
 - Entries: buy-in + rebuys (rebuy unit = 50₪)
   - Quick add: +50 / +100 / +200
@@ -33,13 +33,19 @@ npm run dev
 
 ### Environment
 
-Create `.env.local` (optional):
+Create `.env.local`:
 
 ```bash
-VITE_STORAGE=local              # or: supabase
+# Storage
+VITE_STORAGE=local              # local | supabase
+
+# Supabase (required when VITE_STORAGE=supabase)
 VITE_SUPABASE_URL=...
 VITE_SUPABASE_ANON_KEY=...
-VITE_ENABLE_SUPABASE_AUTH=false
+VITE_ENABLE_SUPABASE_AUTH=true
+
+# Web Push (optional; enables PushManager subscribe)
+VITE_WEB_PUSH_PUBLIC_KEY=...    # VAPID public key (Base64URL)
 ```
 
 ## Tests
@@ -56,11 +62,13 @@ Settlement unit tests are in `src/domain/settlement.test.ts`.
 2. Import into Vercel.
 3. Build command: `npm run build`
 4. Output: `dist`
-5. Add env vars (same as above) if/when enabling Supabase.
+5. Add env vars from the Environment section.
 
 ## Supabase
 
-See `supabase/README.md` and `supabase/schema.sql`.
+- SQL + RLS: `supabase/schema.sql`
+- Edge Functions: `supabase/functions/*`
+- Setup guide (including required secrets): `supabase/README.md`
 
 ## Notes
 - Local-first remains the default.

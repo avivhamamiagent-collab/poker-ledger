@@ -12,7 +12,7 @@ export function GamePage() {
   const { id } = useParams<{ id: string }>()
   const store = useStore()
   const { user } = useAuth()
-  const { toast } = useToast()
+  const toast = useToast()
 
   const [loading, setLoading] = React.useState(true)
   const [game, setGame] = React.useState<any | null>(null)
@@ -41,9 +41,9 @@ export function GamePage() {
     try {
       await store.setMyRsvp(id, status)
       await refresh()
-      toast({ title: 'RSVP saved' })
+      toast.push({ title: 'RSVP saved' })
     } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Failed to RSVP', description: String(err?.message ?? err) })
+      toast.push({ title: 'Failed to RSVP', description: String(err?.message ?? err) })
     }
   }
 
@@ -59,9 +59,9 @@ export function GamePage() {
     try {
       await store.setGameParticipants(id, Array.from(next))
       await refresh()
-      toast({ title: 'Participants updated' })
+      toast.push({ title: 'Participants updated' })
     } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Failed', description: String(err?.message ?? err) })
+      toast.push({ title: 'Failed', description: String(err?.message ?? err) })
     }
   }
 

@@ -1,36 +1,78 @@
-# Supabase integration (scaffold)
+# Supabase integration (Auth + Groups + Push)
 
-This app is **local-first** by default (IndexedDB). Supabase support is planned behind an env toggle.
+This app is **local-first** by default (IndexedDB). Set `VITE_STORAGE=supabase` to enable Supabase end-to-end.
 
-## Files
+## 1) Database schema (SQL + RLS)
 
-- `schema.sql` — initial schema scaffold (players, sessions, participants, ledger_entries, audit_events) + RLS notes.
+Run `schema.sql` in Supabase SQL editor.
 
-## Environment variables
+Tables include:
+- `players`, `sessions`, `session_participants`, `ledger_entries`, `audit_events`
+- `groups`, `group_members`, `group_invites`
+- `games`, `game_rsvps`, `game_participants`
+- `notifications`, `push_subscriptions`
 
-Add these in Vercel (or `.env.local`):
+## 2) Supabase Auth
+
+Enable **Email** provider (magic link).
+
+The app uses `signInWithOtp` and relies on the redirect back to your site.
+
+## 3) Edge Functions
+
+Functions are in `supabase/functions/*`:
+- `create-group`
+- `invite-member`
+- `respond-invite`
+- `create-game`
+- `set-rsvp`
+- `set-participants`
+- `push-send` (utility)
+
+Deploy (CLI example):
 
 ```bash
-VITE_STORAGE=local              # or: supabase
-VITE_SUPABASE_URL=...           # required for supabase
-VITE_SUPABASE_ANON_KEY=...      # required for supabase
-VITE_ENABLE_SUPABASE_AUTH=false # scaffold only
+supabase functions deploy create-group
+supabase functions deploy invite-member
+supabase functions deploy respond-invite
+supabase functions deploy create-game
+supabase functions deploy set-rsvp
+supabase functions deploy set-participants
+supabase functions deploy push-send
 ```
 
-## Recommended approach
+## 4) Edge Function secrets
 
-1. Start with **one user** (your account) — enable Supabase Auth later.
-2. Keep local IndexedDB as a fallback (offline / fast).
-3. Introduce a sync strategy:
-   - Either event-sourcing (`ledger_entries`) or snapshot-per-session.
-   - Conflict resolution: last-write-wins per field OR append-only entries.
+Set these secrets for functions:
 
-## Notes on RLS
+```bash
+# Supabase
+SUPABASE_URL=...
+SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
 
-`schema.sql` uses `user_id = auth.uid()` policies.
+# Web Push (VAPID)
+VAPID_PUBLIC_KEY=...   # Base64URL
+VAPID_PRIVATE_KEY=...  # Base64URL
+VAPID_SUBJECT=mailto:you@example.com
+```
 
-If Auth is disabled but you still want to use Supabase as a backend, you can:
+## 5) Frontend env vars (Vercel)
 
-- temporarily disable RLS (NOT recommended for production), or
-- use service-role key on a server-side API (recommended), keeping anon client locked down.
+```bash
+VITE_STORAGE=supabase
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+VITE_ENABLE_SUPABASE_AUTH=true
+
+# Optional (enables PushManager subscribe)
+VITE_WEB_PUSH_PUBLIC_KEY=...
+```
+
+## Push notification limitations
+
+- Push requires HTTPS + Service Worker support.
+- iOS/Safari push support depends on iOS version and usually requires “Add to Home Screen”.
+- When push is unavailable, the app still creates **in-app notifications** in `notifications`.
+
 

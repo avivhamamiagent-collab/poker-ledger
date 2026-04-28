@@ -11,7 +11,7 @@ import { useStore } from '../../store-context'
 export function GroupPage() {
   const { id } = useParams<{ id: string }>()
   const store = useStore()
-  const { toast } = useToast()
+  const toast = useToast()
 
   const [group, setGroup] = React.useState<Group | null>(null)
   const [members, setMembers] = React.useState<GroupMember[]>([])
@@ -49,9 +49,9 @@ export function GroupPage() {
     try {
       await store.inviteGroupMember(id, inviteEmail.trim())
       setInviteEmail('')
-      toast({ title: 'Invite sent', description: 'They will see it after signing in with that email.' })
+      toast.push({ title: 'Invite sent', description: 'They will see it after signing in with that email.' })
     } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Invite failed', description: String(err?.message ?? err) })
+      toast.push({ title: 'Invite failed', description: String(err?.message ?? err) })
     } finally {
       setInviting(false)
     }
@@ -63,7 +63,7 @@ export function GroupPage() {
 
     const startsAtMs = newStartsAt ? new Date(newStartsAt).getTime() : NaN
     if (!Number.isFinite(startsAtMs)) {
-      toast({ variant: 'destructive', title: 'Pick a date & time' })
+      toast.push({ title: 'Pick a date & time' })
       return
     }
 
@@ -79,9 +79,9 @@ export function GroupPage() {
       setNewStartsAt('')
       setNewLocation('')
       await refresh()
-      toast({ title: 'Game created', description: 'Invites & notifications sent to the group.' })
+      toast.push({ title: 'Game created', description: 'Invites & notifications sent to the group.' })
     } catch (err: any) {
-      toast({ variant: 'destructive', title: 'Failed to create game', description: String(err?.message ?? err) })
+      toast.push({ title: 'Failed to create game', description: String(err?.message ?? err) })
     } finally {
       setCreating(false)
     }
