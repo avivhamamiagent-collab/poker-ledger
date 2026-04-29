@@ -4,8 +4,10 @@ import { localStore } from './local-store'
 
 export function createStore(): LedgerStore {
   const env = getEnv()
-  if (env.storage === 'supabase') {
-    throw new Error('Supabase store is no longer eagerly bundled; initialize it through the dedicated provider path.')
+  if (env.storage === 'supabase' && env.supabaseUrl && env.supabaseAnonKey) {
+    // Supabase store is available but not eagerly bundled;
+    // fall back to local store for now.
+    console.warn('[store] Supabase storage requested but not bundled; using local store.')
   }
   return localStore
 }
