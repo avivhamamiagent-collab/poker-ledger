@@ -1,12 +1,15 @@
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 
 import { cn } from '../../lib/utils'
+import { OnboardingWizard } from '../../components/OnboardingWizard'
+import { useAuth } from '../auth/auth-context'
 import { RosterProvider } from '../roster/roster-context'
 
 export function AppShell() {
   const location = useLocation()
   const nav = useNavigate()
   const path = location.pathname
+  const { enabled, user } = useAuth()
 
   return (
     <div className="bg-background text-on-background min-h-dvh font-body-lg flex flex-col">
@@ -42,6 +45,8 @@ export function AppShell() {
           <Outlet />
         </RosterProvider>
       </main>
+
+      {enabled && user && <OnboardingWizard />}
 
       {/* BottomNavBar */}
       <nav className="fixed bottom-0 left-0 w-full z-50 flex flex-row-reverse justify-around items-center h-20 pb-safe px-4 rtl bg-[#1B4332]/90 dark:bg-[#1B4332]/90 backdrop-blur-xl border-t border-[#D4AF37]/15 shadow-[0_-4px_20px_rgba(0,0,0,0.5)] rounded-t-xl md:hidden">
