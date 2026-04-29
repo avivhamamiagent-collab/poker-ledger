@@ -110,3 +110,40 @@ button {
 .fade-in-delay-1 { animation-delay: 0.15s; opacity: 0; }
 .fade-in-delay-2 { animation-delay: 0.3s; opacity: 0; }
 .fade-in-delay-3 { animation-delay: 0.45s; opacity: 0; }
+
+/* Login page */
+.login-grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.glass-panel {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+@keyframes card-drift {
+  0%, 100% { transform: translateY(0) rotate(-12deg); }
+  50% { transform: translateY(-8px) rotate(-9deg); }
+}
+.card-drift {
+  animation: card-drift 5s ease-in-out infinite;
+}
+
+@keyframes chip-orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.chip-orbit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px dashed rgba(212,175,55,0.5);
+  background: radial-gradient(circle at 35% 35%, #d4af37 0%, #1a472a 50%, #0d2818 100%);
+  box-shadow: 0 4px 20px rgba(212,175,55,0.3);
+  animation: chip-orbit 4s linear infinite;
+}
