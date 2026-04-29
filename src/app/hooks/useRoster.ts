@@ -7,13 +7,9 @@ export function useRoster() {
   const store = useStore()
 
   // If we're inside a RosterProvider (AppShell level), use the shared context
-  try {
-    const ctx = React.useContext(RosterContext)
-    if (ctx) {
-      return { roster: ctx, setRoster: () => {}, loading: false, error: null, refresh: () => Promise.resolve() }
-    }
-  } catch {
-    // Not in provider, fall through
+  const ctx = React.useContext(RosterContext)
+  if (ctx !== null) {
+    return { roster: ctx, setRoster: () => {}, loading: false, error: null, refresh: () => Promise.resolve() }
   }
 
   // Otherwise, fall back to direct loading (standalone pages)

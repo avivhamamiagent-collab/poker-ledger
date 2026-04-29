@@ -8,9 +8,10 @@ export function useSession() {
   const { id } = useParams()
   const store = useStore()
   const ctx = useSessionContext()
+  const inProvider = ctx !== null
 
   // If we're inside a SessionProvider (SessionLayout level), use the shared context
-  if (ctx !== undefined) {
+  if (inProvider) {
     return {
       id,
       session: ctx,

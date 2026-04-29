@@ -58,10 +58,5 @@ bootstrap().catch((err) => {
   }
 })
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {
-      // ignore
-    })
-  })
-}
+// Temporarily disable SW registration while stabilizing first paint.
+// It can be re-enabled after the blank-screen path is fully resolved.
