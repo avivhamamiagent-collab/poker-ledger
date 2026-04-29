@@ -15,13 +15,16 @@ export function LoginPage() {
   const toast = useToast()
 
   const [email, setEmail] = React.useState('')
+  const [password, setPassword] = React.useState('')
+  const [displayName, setDisplayName] = React.useState('')
+  const [isSignUp, setIsSignUp] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
 
   React.useEffect(() => {
     if (enabled && user) navigate('/', { replace: true })
   }, [enabled, user, navigate])
 
-  async function sendMagicLink(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!enabled) {
       navigate('/', { replace: true })
@@ -30,21 +33,23 @@ export function LoginPage() {
     setLoading(true)
     try {
       const sb = supabase()
-      const redirectTo = window.location.origin
-      const { error } = await sb.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: redirectTo },
-      })
-      if (error) throw error
-      toast.push({ title: 'הקישור נשלח', description: 'בדקו את האימייל ופתחו את קישור הכניסה.' })
-      setEmail('')
+      if (isSignUp) {
+        const { error } = await sb.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { display_name: displayName },
+          },
+        })
+        if (error) throw error
+        toast.push({ title: 'נרשמת בהצלחה', description: 'אפשר להתחיל לשחק!' })
+      } else {
+        const { error } = await sb.auth.signInWithPassword({ email, password })
+        if (error) throw error
+      }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
-      if (msg.toLowerCase().includes('rate limit')) {
-        toast.push({ title: 'יותר מדי בקשות', description: 'חכו דקה ונסו שוב. אם זה חוזר — המייל כנראה כבר נשלח, בדקו בתיבת הדוא"ר.' })
-      } else {
-        toast.push({ title: 'הכניסה נכשלה', description: msg })
-      }
+      toast.push({ title: isSignUp ? 'ההרשמה נכשלה' : 'הכניסה נכשלה', description: msg })
     } finally {
       setLoading(false)
     }
@@ -115,9 +120,26 @@ export function LoginPage() {
                   </p>
                 </div>
 
-                <form onSubmit={sendMagicLink} className="space-y-3">
+                <form onSubmit={handleSubmit} className="space-y-3">
                   {enabled ? (
                     <>
+                      {isSignUp && (
+                        <>
+                          <label className="block text-right text-sm font-medium text-zinc-200" htmlFor="displayName">
+                            שם תצוגה
+                          </label>
+                          <Input
+                            id="displayName"
+                            type="text"
+                            autoComplete="name"
+                            placeholder="אביב"
+                            value={displayName}
+                            onChange={(e) => setDisplayName(e.target.value)}
+                            required
+                            className="h-12 border-white/10 bg-white/5 text-base text-zinc-50 placeholder:text-zinc-500 focus-visible:ring-emerald-300"
+                          />
+                        </>
+                      )}
                       <label className="block text-right text-sm font-medium text-zinc-200" htmlFor="email">
                         אימייל
                       </label>
@@ -132,6 +154,20 @@ export function LoginPage() {
                         required
                         className="h-12 border-white/10 bg-white/5 text-base text-zinc-50 placeholder:text-zinc-500 focus-visible:ring-emerald-300"
                       />
+                      <label className="block text-right text-sm font-medium text-zinc-200" htmlFor="password">
+                        סיסמה
+                      </label>
+                      <Input
+                        id="password"
+                        type="password"
+                        autoComplete={isSignUp ? 'new-password' : 'current-password'}
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        minLength={6}
+                        className="h-12 border-white/10 bg-white/5 text-base text-zinc-50 placeholder:text-zinc-500 focus-visible:ring-emerald-300"
+                      />
                     </>
                   ) : null}
                   <Button
@@ -139,13 +175,22 @@ export function LoginPage() {
                     disabled={loading}
                     className="relative h-12 w-full overflow-hidden rounded-xl border border-amber-300/20 bg-[linear-gradient(180deg,#d4af37,#a97f11)] text-base font-semibold text-[#1a1200] shadow-[0_18px_60px_rgba(212,175,55,0.28)] hover:bg-[linear-gradient(180deg,#e3bf4e,#b88c17)]"
                   >
-                    {loading ? 'שולח…' : enabled ? 'שליחת קישור כניסה' : 'כניסה לאפליקציה'}
+                    {loading ? 'רגע…' : enabled ? (isSignUp ? 'הרשמה' : 'כניסה') : 'כניסה לאפליקציה'}
                     {!enabled ? <ArrowLeft className="relative z-10 h-4 w-4" /> : null}
                     <span
                       aria-hidden
                       className="absolute inset-0 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.45),transparent)] bg-[length:200%_100%] opacity-35 motion-safe:animate-shimmer"
                     />
                   </Button>
+                  {enabled && (
+                    <button
+                      type="button"
+                      onClick={() => setIsSignUp(!isSignUp)}
+                      className="w-full text-center text-sm text-zinc-400 hover:text-zinc-200"
+                    >
+                      {isSignUp ? 'כבר יש חשבון? כניסה' : 'אין חשבון? הרשמה'}
+                    </button>
+                  )}
                 </form>
 
                 <div className="rounded-2xl border border-white/8 bg-white/5 p-4">
