@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Calculator, ListChecks, Share2, Spade, UsersRound } from 'lucide-react'
+import { ArrowLeft, ListChecks, Spade, UsersRound } from 'lucide-react'
 
 import { Button } from '../../components/ui/button'
 import { Card, CardContent } from '../../components/ui/card'
 import { Input } from '../../components/ui/input'
 import { useToast } from '../../components/ui/use-toast'
-import { useAuth, signUp, signIn } from '../auth/auth-context'
+import { signIn, signUp, useAuth } from '../auth/auth-context'
 
 export function LoginPage() {
   const { user } = useAuth()
@@ -28,10 +28,10 @@ export function LoginPage() {
     setLoading(true)
     try {
       if (isSignUp) {
-        signUp(email, password, displayName)
+        await signUp(email, password, displayName)
         toast.push({ title: 'נרשמת בהצלחה! 🎉', description: 'ברוכים הבאים לפנקס פוקר.' })
       } else {
-        signIn(email, password)
+        await signIn(email, password)
       }
       navigate('/', { replace: true })
     } catch (err: unknown) {
@@ -74,8 +74,8 @@ export function LoginPage() {
             <div className="mx-auto grid max-w-2xl gap-3 sm:grid-cols-3 lg:mx-0">
               {[
                 { icon: UsersRound, title: 'שחקנים', text: 'רוסטר קבוע לכל הערבים.' },
-                { icon: Calculator, title: 'חישוב', text: 'ריבאים, קאשאאוט והפרש קופה.' },
-                { icon: Share2, title: 'סגירה', text: 'סיכום והעברות בסוף המשחק.' },
+                { icon: ListChecks, title: 'חישוב', text: 'ריבאים, קאשאאוט והפרש קופה.' },
+                { icon: ArrowLeft, title: 'סגירה', text: 'סיכום והעברות בסוף המשחק.' },
               ].map(({ icon: Icon, title, text }) => (
                 <div key={title} className="glass-panel rounded-2xl p-4 text-right shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
                   <Icon className="mb-3 h-5 w-5 text-amber-300" />
@@ -102,7 +102,7 @@ export function LoginPage() {
                   </h2>
                   <p className="text-sm leading-6 text-zinc-300">
                     {isSignUp
-                      ? 'הרשמה מהירה — בלי אימייל, בלי טלפון, רק שם וסיסמה.'
+                      ? 'הרשמה מהירה עם אימייל וסיסמה. אחרי זה נשארים מחוברים.'
                       : 'הכנס אימייל וסיסמה וקדימה לשחק.'}
                   </p>
                 </div>
