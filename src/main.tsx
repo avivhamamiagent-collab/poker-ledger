@@ -18,13 +18,30 @@ async function bootstrap() {
   const { BrowserRouter } = await import('react-router-dom')
   const { App } = await import('./app/App')
 
-  createRoot(document.getElementById('root')!).render(
+  const el = document.getElementById('root')
+  if (!el) throw new Error('Missing root element')
+
+  createRoot(el).render(
     <StrictMode>
       <BrowserRouter>
         <App />
       </BrowserRouter>
     </StrictMode>,
   )
+
+  window.setTimeout(() => {
+    const root = document.getElementById('root')
+    if (root && !root.textContent?.trim()) {
+      root.innerHTML = `
+        <div style="min-height:100dvh;display:flex;align-items:center;justify-content:center;background:#070b12;color:#e7eefc;font-family:system-ui,sans-serif;padding:24px;text-align:center">
+          <div style="max-width:620px">
+            <div style="font-size:22px;font-weight:700;margin-bottom:8px">Poker Ledger is still initializing</div>
+            <div style="font-size:14px;opacity:.85;line-height:1.5">If this stays blank, the app is hanging before first paint.</div>
+          </div>
+        </div>
+      `
+    }
+  }, 2500)
 }
 
 bootstrap().catch((err) => {
