@@ -15,7 +15,8 @@ const AuthContext = React.createContext<AuthState | null>(null)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const env = getEnv()
-  const enabled = env.storage === 'supabase' && env.enableSupabaseAuth
+  const hasSupabaseConfig = Boolean(env.supabaseUrl && env.supabaseAnonKey)
+  const enabled = env.storage === 'supabase' && env.enableSupabaseAuth && hasSupabaseConfig
 
   const [state, setState] = React.useState<AuthState>({ enabled, user: null, loading: enabled })
 
@@ -25,7 +26,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    const sb = supabase()
+    let sb
+    try {
+      sb = supabase()
+    } catch (e: any) {
+      setState({ enabled: false, user: null, loading: false, error: String(e?.message ?? e) })
+      return
+    }
 
     let cancelled = false
 
