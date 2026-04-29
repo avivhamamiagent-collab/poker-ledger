@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { Button } from './ui/button'
 import { cn } from '../lib/utils'
+import { useAuth } from '../app/auth/auth-context'
 
 type Step = {
   title: string
@@ -11,7 +12,9 @@ type Step = {
   cta?: { label: string; to: string }
 }
 
-const STORAGE_KEY = 'onboarding_complete'
+function storageKey(userId: string) {
+  return `onboarding_complete_${userId}`
+}
 
 const STEPS: Step[] = [
   {
@@ -48,6 +51,7 @@ const STEPS: Step[] = [
 ]
 
 export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
+  const { user } = useAuth()
   const nav = useNavigate()
   const [open, setOpen] = React.useState(false)
 
@@ -56,14 +60,16 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
   const [direction, setDirection] = React.useState<'next' | 'prev'>('next')
   const [animating, setAnimating] = React.useState(false)
 
+  // Check per-user onboarding completion
   React.useEffect(() => {
+    if (!user) return
     try {
-      const done = window.localStorage.getItem(STORAGE_KEY)
+      const done = localStorage.getItem(storageKey(user.id))
       setOpen(done !== 'true')
     } catch {
       setOpen(true)
     }
-  }, [])
+  }, [user])
 
   React.useEffect(() => {
     if (!animating) return
@@ -91,14 +97,21 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
   }
 
   function finish() {
+    if (!user) return
     try {
-      window.localStorage.setItem(STORAGE_KEY, 'true')
-    } catch {
-      // ignore
-    }
+      localStorage.setItem(storageKey(user.id), 'true')
+    } catch {}
     setOpen(false)
     onComplete?.()
     nav('/groups', { replace: true })
+  }
+
+  function skip() {
+    if (!user) return
+    try {
+      localStorage.setItem(storageKey(user.id), 'true')
+    } catch {}
+    setOpen(false)
   }
 
   if (!open) return null
@@ -158,12 +171,7 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
 
             <button
               type="button"
-              onClick={() => {
-                try {
-                  window.localStorage.setItem(STORAGE_KEY, 'true')
-                } catch {}
-                setOpen(false)
-              }}
+              onClick={skip}
               className="text-xs font-medium text-zinc-200/80 hover:text-zinc-50"
             >
               דלג
