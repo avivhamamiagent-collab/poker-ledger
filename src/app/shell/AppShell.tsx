@@ -1,106 +1,101 @@
-import type { ReactNode } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import { Bell, Sparkles, Spade, Users, UsersRound } from 'lucide-react'
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 
 import { cn } from '../../lib/utils'
-import { getEnv } from '../../config/env'
-import { useAuth } from '../auth/auth-context'
 import { RosterProvider } from '../roster/roster-context'
 
 export function AppShell() {
   const location = useLocation()
-  const isSession = location.pathname.startsWith('/session/')
-  const env = getEnv()
-  const { enabled, user } = useAuth()
+  const nav = useNavigate()
+  const path = location.pathname
 
   return (
-    <div className="app-shell min-h-dvh text-zinc-50">
-      <div className="app-shell-bg pointer-events-none fixed inset-0" />
+    <div className="bg-background text-on-background min-h-dvh font-body-lg flex flex-col">
+      <div className="casino-ambient-glow" />
 
-      <header className="sticky top-0 z-40 border-b border-white/8 bg-[#070b12]/72 backdrop-blur-xl">
-        <div className="container flex h-16 items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-3 font-semibold tracking-tight">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-300/20 bg-[linear-gradient(180deg,rgba(212,175,55,0.22),rgba(26,71,42,0.25))] shadow-[0_0_40px_rgba(0,255,136,0.08)]">
-              <Spade className="h-5 w-5 text-emerald-300" />
-            </span>
-            <span className="brand-glow text-base sm:text-lg">Poker Ledger</span>
-          </Link>
+      {/* TopAppBar */}
+      <header className="fixed top-0 w-full z-50 bg-[#081C15]/80 dark:bg-[#081C15]/80 backdrop-blur-xl border-b border-[#D4AF37]/20 shadow-2xl flex flex-row-reverse justify-between items-center px-6 h-16 rtl">
+        <button
+          type="button"
+          onClick={() => nav('/profile')}
+          className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-[rgba(212,175,55,0.3)] shrink-0"
+          aria-label="פרופיל"
+        >
+          <span className="material-symbols-outlined text-on-surface-variant text-[20px]">person</span>
+        </button>
 
-          <div className="flex items-center gap-2">
-            <div className="hidden items-center gap-2 rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-xs text-zinc-300 sm:flex">
-              <Sparkles className="h-3.5 w-3.5 text-amber-300" />
-              Dark poker mode
-            </div>
-            {env.storage === 'supabase' ? (
-              <Link
-                to="/notifications"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-white/5 text-zinc-200 transition hover:border-amber-300/30 hover:text-white hover:shadow-[0_0_24px_rgba(212,175,55,0.16)]"
-                aria-label="Notifications"
-              >
-                <Bell className="h-4 w-4" />
-              </Link>
-            ) : null}
-            <div className="hidden rounded-full border border-emerald-300/15 bg-emerald-300/10 px-3 py-1.5 text-xs text-emerald-100 sm:block">
-              ₪ ILS
-            </div>
-            {enabled && user ? (
-              <button
-                type="button"
-                className="rounded-full border border-white/8 bg-white/5 px-3 py-1.5 text-xs text-zinc-200 transition hover:border-white/20 hover:bg-white/10"
-                onClick={() => {
-                  import('../../data/supabase/client').then((m) => m.supabase().auth.signOut())
-                }}
-              >
-                יציאה
-              </button>
-            ) : null}
-          </div>
-        </div>
+        <h1 className="text-xl font-black text-[#D4AF37] tracking-widest font-inter tracking-tight text-right text-headline-md font-headline-md">
+          פנקס פוקר
+        </h1>
+
+        <Link
+          to="/groups"
+          className="text-emerald-500 dark:text-emerald-400 hover:bg-[#1B4332] transition-colors scale-95 active:opacity-80 p-2 rounded-full flex items-center justify-center"
+          aria-label="קבוצות"
+        >
+          <span className="material-symbols-outlined">groups</span>
+        </Link>
       </header>
 
-      <main className={cn('container relative z-10 pb-28 pt-5', isSession && 'pt-4')}>
+      {/* Main Content Canvas */}
+      <main className="flex-grow pt-[88px] pb-[100px] px-container-padding flex flex-col gap-section-margin relative z-10">
         <RosterProvider>
           <Outlet />
         </RosterProvider>
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/8 bg-[#070b12]/82 backdrop-blur-xl">
-        <div className="container grid grid-cols-3 gap-2 py-2">
-          <BottomNavItem to="/groups" label="קבוצות" icon={<UsersRound className="h-5 w-5" />} />
-          <BottomNavItem to="/roster" label="רוסטר" icon={<Users className="h-5 w-5" />} />
-          <BottomNavItem to="/" label="שולחנות" icon={<Spade className="h-5 w-5" />} end />
-        </div>
+      {/* BottomNavBar */}
+      <nav className="fixed bottom-0 left-0 w-full z-50 flex flex-row-reverse justify-around items-center h-20 pb-safe px-4 rtl bg-[#1B4332]/90 dark:bg-[#1B4332]/90 backdrop-blur-xl border-t border-[#D4AF37]/15 shadow-[0_-4px_20px_rgba(0,0,0,0.5)] rounded-t-xl md:hidden">
+        <BottomNavButton
+          active={path === '/' || path.startsWith('/session/')}
+          onClick={() => nav('/')}
+          label="בית"
+          icon="home"
+        />
+        <BottomNavButton active={path === '/sessions'} onClick={() => nav('/sessions')} label="היסטוריה" icon="history" />
+        <BottomNavButton
+          active={path.startsWith('/groups') || path.startsWith('/group') || path.startsWith('/game')}
+          onClick={() => nav('/groups')}
+          label="קבוצות"
+          icon="groups"
+        />
+        <BottomNavButton
+          active={path.startsWith('/profile') || path.startsWith('/settings')}
+          onClick={() => nav('/profile')}
+          label="פרופיל"
+          icon="person"
+        />
       </nav>
     </div>
   )
 }
 
-function BottomNavItem({
-  to,
+function BottomNavButton({
+  active,
+  onClick,
   label,
   icon,
-  end,
 }: {
-  to: string
+  active: boolean
+  onClick: () => void
   label: string
-  icon: ReactNode
-  end?: boolean
+  icon: string
 }) {
   return (
-    <NavLink
-      to={to}
-      end={end}
-      className={({ isActive }) =>
-        cn(
-          'flex flex-col items-center justify-center gap-1 rounded-2xl border px-3 py-2 text-xs font-medium transition',
-          isActive
-            ? 'border-amber-300/25 bg-[linear-gradient(180deg,rgba(212,175,55,0.18),rgba(26,71,42,0.24))] text-white shadow-[0_0_28px_rgba(0,255,136,0.1)]'
-            : 'border-white/5 bg-white/3 text-zinc-400 hover:border-white/10 hover:bg-white/6 hover:text-zinc-200',
-        )
-      }
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'flex flex-col items-center justify-center transition-all w-16',
+        active ? 'text-[#D4AF37] scale-110' : 'text-slate-400 opacity-60 hover:text-emerald-300 active:-translate-y-0.5 duration-300',
+      )}
     >
-      {icon}
-      {label}
-    </NavLink>
+      <span
+        className="material-symbols-outlined mb-1"
+        style={active ? ({ fontVariationSettings: '"FILL" 1' } as any) : undefined}
+      >
+        {icon}
+      </span>
+      <span className="text-[11px] font-medium font-inter">{label}</span>
+    </button>
   )
 }
