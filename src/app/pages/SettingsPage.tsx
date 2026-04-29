@@ -9,15 +9,16 @@ export function SettingsPage() {
   const env = getEnv()
 
   return (
-    <div className="bg-background text-on-background min-h-screen antialiased selection:bg-primary/20">
+    <div className="text-on-background antialiased selection:bg-primary/20">
       <main className="flex flex-col gap-section-margin">
-        <section>
-          <h1 className="font-headline-lg text-headline-lg text-on-surface mb-2">הגדרות מערכת</h1>
-          <p className="font-body-sm text-body-sm text-on-surface-variant">ניהול העדפות, תצוגה ונתוני אפליקציה.</p>
+        <section className="gold-bezel overflow-hidden rounded-2xl bg-surface-container-low/78 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.34)]">
+          <div className="text-xs font-semibold text-tertiary">קונפיגורציה</div>
+          <h1 className="mt-1 font-headline-lg text-2xl font-black text-on-surface">הגדרות מערכת</h1>
+          <p className="mt-1 font-body-sm text-body-sm leading-6 text-on-surface-variant">ניהול העדפות, תצוגה ונתוני אפליקציה.</p>
         </section>
 
         <section className="grid grid-cols-2 gap-stack-gap">
-          <div className="col-span-1 bg-surface-container rounded-2xl p-4 border border-outline/10 shadow-sm flex flex-col justify-between min-h-[140px] relative overflow-hidden group hover:border-primary/30 transition-colors active:scale-[0.98]">
+          <div className="col-span-1 bg-surface-container/78 rounded-2xl p-4 border border-tertiary/14 shadow-[0_14px_40px_rgba(0,0,0,0.24)] flex flex-col justify-between min-h-[140px] relative overflow-hidden group hover:border-primary/30 transition-colors active:scale-[0.98]">
             <div className="flex justify-between items-start mb-4">
               <div className="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
                 <span className="material-symbols-outlined text-primary">language</span>
@@ -30,7 +31,7 @@ export function SettingsPage() {
             </div>
           </div>
 
-          <div className="col-span-1 bg-surface-container rounded-2xl p-4 border border-outline/10 shadow-sm flex flex-col justify-between min-h-[140px] relative overflow-hidden opacity-90">
+          <div className="col-span-1 bg-surface-container/78 rounded-2xl p-4 border border-tertiary/14 shadow-[0_14px_40px_rgba(0,0,0,0.24)] flex flex-col justify-between min-h-[140px] relative overflow-hidden opacity-90">
             <div className="flex justify-between items-start mb-4">
               <div className="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
                 <span className="material-symbols-outlined text-tertiary">payments</span>
@@ -44,7 +45,7 @@ export function SettingsPage() {
             <div className="absolute inset-0 bg-gradient-to-br from-tertiary/5 to-transparent pointer-events-none" />
           </div>
 
-          <div className="col-span-2 bg-surface-container rounded-2xl p-5 border border-outline/10 shadow-sm flex flex-col gap-4">
+          <div className="col-span-2 bg-surface-container/78 rounded-2xl p-5 border border-tertiary/14 shadow-[0_14px_40px_rgba(0,0,0,0.24)] flex flex-col gap-4">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center">
                 <span className="material-symbols-outlined text-primary text-sm">cloud_sync</span>
@@ -64,14 +65,14 @@ export function SettingsPage() {
                 onClick={() => toast.push({ title: 'מצב אחסון נקבע בקונפיג', description: `כעת: ${env.storage}` })}
                 className="relative z-10 flex-1 py-2 text-center font-body-sm text-body-sm text-on-primary-container font-medium"
               >
-                ענן (מומלץ)
+                ענן
               </button>
               <button
                 type="button"
                 onClick={() => toast.push({ title: 'מצב אחסון נקבע בקונפיג', description: `כעת: ${env.storage}` })}
                 className="relative z-10 flex-1 py-2 text-center font-body-sm text-body-sm text-on-surface-variant"
               >
-                מקומי בלבד
+                מקומי
               </button>
             </div>
 
@@ -83,15 +84,15 @@ export function SettingsPage() {
           <button
             type="button"
             onClick={() => nav('/profile')}
-            className="col-span-2 bg-surface-container rounded-2xl p-5 border border-outline/10 shadow-sm flex items-center justify-between active:scale-[0.98] transition-transform"
+            className="col-span-2 bg-surface-container/78 rounded-2xl p-5 border border-tertiary/14 shadow-[0_14px_40px_rgba(0,0,0,0.24)] flex items-center justify-between active:scale-[0.98] transition-transform"
           >
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
                 <span className="material-symbols-outlined text-on-surface">help</span>
               </div>
               <div className="text-right">
-                <h3 className="font-body-lg text-body-lg text-on-surface">מרכז תמיכה</h3>
-                <p className="font-body-sm text-body-sm text-on-surface-variant">שאלות נפוצות ויצירת קשר</p>
+                <h3 className="font-body-lg text-body-lg text-on-surface">כל הפיצ׳רים</h3>
+                <p className="font-body-sm text-body-sm text-on-surface-variant">חזרה למרכז הקיצורים</p>
               </div>
             </div>
             <span className="material-symbols-outlined text-on-surface-variant transform rotate-90">expand_less</span>

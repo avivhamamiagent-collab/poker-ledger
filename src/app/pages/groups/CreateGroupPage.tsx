@@ -21,8 +21,8 @@ export function CreateGroupPage() {
       const g = await store.createGroup(n)
       toast.push({ title: 'קבוצה נוצרה' })
       nav(`/group/${g.id}`, { replace: true })
-    } catch (err: any) {
-      toast.push({ title: 'יצירת קבוצה נכשלה', description: String(err?.message ?? err) })
+    } catch (err: unknown) {
+      toast.push({ title: 'יצירת קבוצה נכשלה', description: err instanceof Error ? err.message : String(err) })
     } finally {
       setCreating(false)
     }
@@ -65,11 +65,11 @@ export function CreateGroupPage() {
           </div>
         </section>
 
-        {/* Players Section (visual-only for now) */}
+        {/* Players Section */}
         <section className="bg-surface-container rounded-xl border border-outline-variant/30 p-5 flex flex-col gap-stack-gap shadow-[0px_4px_20px_rgba(0,0,0,0.3)]">
           <div className="flex justify-between items-end mb-2">
             <h3 className="font-label-caps text-label-caps text-on-surface-variant">שחקנים התחלתיים</h3>
-            <span className="font-body-sm text-[12px] text-primary bg-primary-container px-2 py-0.5 rounded-full">1 נבחרו</span>
+            <span className="font-body-sm text-[12px] text-primary bg-primary-container px-2 py-0.5 rounded-full">מנהל אחד</span>
           </div>
           <div className="flex flex-col gap-2 mb-4">
             <div className="flex items-center justify-between p-3 bg-surface-container-high rounded-lg border border-outline-variant/20">
@@ -85,30 +85,8 @@ export function CreateGroupPage() {
               <span className="material-symbols-outlined text-primary/50">verified</span>
             </div>
           </div>
-          <div className="pt-4 border-t border-outline-variant/20 flex flex-col gap-3">
-            <h4 className="font-label-caps text-label-caps text-on-surface-variant/70">הוסף שחקן חדש</h4>
-            <div className="flex gap-2">
-              <input
-                className="flex-1 bg-surface-container-lowest text-on-surface font-body-sm text-body-sm border border-outline-variant/30 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none px-3 py-2.5 transition-all placeholder:text-on-surface-variant/50"
-                placeholder="שם מלא / כינוי"
-                type="text"
-                disabled
-              />
-              <input
-                className="flex-1 bg-surface-container-lowest text-on-surface font-body-sm text-body-sm border border-outline-variant/30 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none px-3 py-2.5 transition-all placeholder:text-on-surface-variant/50"
-                placeholder="טלפון"
-                type="tel"
-                disabled
-              />
-            </div>
-            <button
-              type="button"
-              className="self-start mt-1 flex items-center gap-2 text-primary font-label-caps text-label-caps border border-primary/30 rounded-lg px-4 py-2 opacity-60 cursor-not-allowed"
-              disabled
-            >
-              <span className="material-symbols-outlined text-sm">person_add</span>
-              הוסף לרשימה
-            </button>
+          <div className="rounded-xl border border-tertiary/14 bg-black/14 p-4 text-sm leading-6 text-on-surface-variant">
+            אחרי יצירת הקבוצה אפשר להזמין חברים וליצור משחק. במצב מקומי ההזמנות נשמרות בתוך האפליקציה, ובמצב Supabase הן נשלחות לקבוצה בענן.
           </div>
         </section>
       </main>
@@ -122,7 +100,7 @@ export function CreateGroupPage() {
           className="w-full h-touch-target bg-primary-container text-primary font-headline-md text-headline-md rounded-xl flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(27,67,50,0.5)] active:scale-[0.98] transition-all border border-primary/20 hover:bg-primary hover:text-on-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span className="material-symbols-outlined">add_circle</span>
-          {creating ? 'יוצר…' : 'צור קבוצה והתחל סשן'}
+          {creating ? 'יוצר…' : 'צור קבוצה'}
         </button>
       </div>
     </div>

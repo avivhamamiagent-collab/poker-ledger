@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { CalendarClock, Check, CircleHelp, X } from 'lucide-react'
 
 import { Button } from '../../../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card'
 import { useToast } from '../../../components/ui/use-toast'
-import type { GameParticipant, GameRsvp } from '../../../domain/types'
+import type { Game, GameParticipant, GameRsvp } from '../../../domain/types'
 import { useAuth } from '../../auth/auth-context'
 import { useStore } from '../../store-context'
 
@@ -15,7 +16,7 @@ export function GamePage() {
   const toast = useToast()
 
   const [loading, setLoading] = React.useState(true)
-  const [game, setGame] = React.useState<any | null>(null)
+  const [game, setGame] = React.useState<Game | null>(null)
   const [rsvps, setRsvps] = React.useState<GameRsvp[]>([])
   const [participants, setParticipants] = React.useState<GameParticipant[]>([])
 
@@ -33,7 +34,10 @@ export function GamePage() {
   }, [id, store])
 
   React.useEffect(() => {
-    refresh().catch(() => {})
+    const timer = window.setTimeout(() => {
+      refresh().catch(() => {})
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [refresh])
 
   async function setRsvp(status: GameRsvp['status']) {
@@ -42,8 +46,8 @@ export function GamePage() {
       await store.setMyRsvp(id, status)
       await refresh()
       toast.push({ title: 'התשובה נשמרה' })
-    } catch (err: any) {
-      toast.push({ title: 'שמירת התשובה נכשלה', description: String(err?.message ?? err) })
+    } catch (err: unknown) {
+      toast.push({ title: 'שמירת התשובה נכשלה', description: err instanceof Error ? err.message : String(err) })
     }
   }
 
@@ -60,63 +64,72 @@ export function GamePage() {
       await store.setGameParticipants(id, Array.from(next))
       await refresh()
       toast.push({ title: 'המשתתפים עודכנו' })
-    } catch (err: any) {
-      toast.push({ title: 'נכשל', description: String(err?.message ?? err) })
+    } catch (err: unknown) {
+      toast.push({ title: 'נכשל', description: err instanceof Error ? err.message : String(err) })
     }
   }
 
   if (!id) return null
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-5">
+      <section className="gold-bezel overflow-hidden rounded-2xl bg-surface-container-low/78 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.34)]">
+        <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-lg font-semibold">{game?.title || 'משחק'}</h1>
-          {game?.startsAt ? <p className="text-sm text-zinc-500">{new Date(game.startsAt).toLocaleString()}</p> : null}
-          {game?.location ? <p className="text-sm text-zinc-500">{game.location}</p> : null}
+            <div className="text-xs font-semibold text-tertiary">משחק מתוכנן</div>
+            <h1 className="text-2xl font-black text-on-surface">{game?.title || 'משחק'}</h1>
+            {game?.startsAt ? <p className="mt-1 text-sm text-on-surface-variant">{new Date(game.startsAt).toLocaleString('he-IL')}</p> : null}
+            {game?.location ? <p className="text-sm text-on-surface-variant">{game.location}</p> : null}
         </div>
         {game?.groupId ? (
-          <Link to={`/group/${game.groupId}`} className="text-sm text-zinc-600 underline underline-offset-4">
-            Back
+            <Link to={`/group/${game.groupId}`} className="rounded-lg border border-tertiary/16 px-3 py-2 text-sm font-semibold text-tertiary">
+              חזרה
           </Link>
         ) : null}
-      </div>
+        </div>
+      </section>
 
       <Card>
         <CardHeader>
-          <CardTitle>Your RSVP</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarClock className="h-5 w-5 text-tertiary" />
+            התשובה שלך
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-2 motion-safe:animate-slideUp">
+          <div className="grid grid-cols-3 gap-2 motion-safe:animate-slideUp">
             <Button variant={myRsvp === 'going' ? 'default' : 'secondary'} onClick={() => setRsvp('going')}>
-              Going
+              <Check className="h-4 w-4" />
+              מגיע
             </Button>
             <Button variant={myRsvp === 'interested' ? 'default' : 'secondary'} onClick={() => setRsvp('interested')}>
-              Interested
+              <CircleHelp className="h-4 w-4" />
+              אולי
             </Button>
             <Button variant={myRsvp === 'no' ? 'default' : 'secondary'} onClick={() => setRsvp('no')}>
-              No
+              <X className="h-4 w-4" />
+              לא
             </Button>
           </div>
-          <p className="mt-2 text-xs text-zinc-500">זה משותף עם הקבוצה.</p>
+          <p className="mt-3 text-xs leading-5 text-on-surface-variant">התשובה משותפת עם הקבוצה כדי שהמארח יבחר משתתפים סופיים.</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>RSVPs</CardTitle>
+          <CardTitle>תגובות RSVP</CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-sm text-zinc-500">Loading…</div>
+            <div className="text-sm text-on-surface-variant">טוען…</div>
           ) : rsvps.length === 0 ? (
-            <div className="text-sm text-zinc-500">No RSVPs yet.</div>
+            <div className="text-sm text-on-surface-variant">אין תגובות עדיין.</div>
           ) : (
             <div className="grid grid-cols-2 gap-2">
               {rsvps.map((r) => (
-                <div key={r.userId} className="rounded-md border border-zinc-200 p-3 text-sm">
-                  <div className="font-medium">{r.status.toUpperCase()}</div>
-                  <div className="text-xs text-zinc-500">Updated {new Date(r.updatedAt).toLocaleString()}</div>
+                <div key={r.userId} className="rounded-xl border border-tertiary/14 bg-black/14 p-3 text-sm">
+                  <div className="font-medium">{statusLabel(r.status)}</div>
+                  <div className="text-xs text-on-surface-variant">עודכן {new Date(r.updatedAt).toLocaleString('he-IL')}</div>
                 </div>
               ))}
             </div>
@@ -126,13 +139,13 @@ export function GamePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Participants (host picks)</CardTitle>
+          <CardTitle>משתתפים סופיים</CardTitle>
         </CardHeader>
         <CardContent>
           {!isHost ? (
-            <div className="text-sm text-zinc-500">רק המארח יכול לבחור את המשתתפים הסופיים.</div>
+            <div className="text-sm text-on-surface-variant">רק המארח יכול לבחור את המשתתפים הסופיים.</div>
           ) : (
-            <div className="text-sm text-zinc-500">לוחצים על כרטיס תשובה כדי לכלול/להוציא.</div>
+            <div className="text-sm text-on-surface-variant">לוחצים על כרטיס תשובה כדי לכלול או להוציא.</div>
           )}
 
           <div className="mt-3 grid grid-cols-2 gap-2">
@@ -145,15 +158,15 @@ export function GamePage() {
                   type="button"
                   onClick={() => (clickable ? toggleParticipant(r.userId) : null)}
                   className={
-                    'rounded-md border p-3 text-left text-sm transition-colors ' +
+                    'rounded-xl border p-3 text-right text-sm transition-colors ' +
                     (selected
-                      ? 'border-zinc-900 bg-zinc-900 text-zinc-50'
-                      : 'border-zinc-200 bg-white hover:bg-zinc-50')
+                      ? 'border-tertiary/30 bg-tertiary/14 text-tertiary'
+                      : 'border-tertiary/14 bg-black/14 text-on-surface hover:bg-surface-container-high/70')
                   }
                   disabled={!clickable}
                 >
-                  <div className="font-medium">{r.status.toUpperCase()}</div>
-                  <div className="text-xs opacity-80">{selected ? 'נבחר' : 'Not selected'}</div>
+                  <div className="font-medium">{statusLabel(r.status)}</div>
+                  <div className="text-xs opacity-80">{selected ? 'נבחר' : 'לא נבחר'}</div>
                 </button>
               )
             })}
@@ -162,10 +175,10 @@ export function GamePage() {
           {game?.sessionId ? (
             <div className="mt-4">
               <Button asChild>
-                <Link to={`/session/${game.sessionId}`}>Open ledger</Link>
+                <Link to={`/session/${game.sessionId}`}>פתח לדג׳ר</Link>
               </Button>
-              <p className="mt-2 text-xs text-zinc-500">
-                The ledger is shared to the group (members can view/edit). If push is not supported on your browser, you’ll still get in-app notifications.
+              <p className="mt-2 text-xs leading-5 text-on-surface-variant">
+                הלדג׳ר משותף לקבוצה. גם בלי Push, התראות פנימיות יופיעו באפליקציה.
               </p>
             </div>
           ) : null}
@@ -173,4 +186,10 @@ export function GamePage() {
       </Card>
     </div>
   )
+}
+
+function statusLabel(status: GameRsvp['status']) {
+  if (status === 'going') return 'מגיע'
+  if (status === 'interested') return 'אולי'
+  return 'לא מגיע'
 }

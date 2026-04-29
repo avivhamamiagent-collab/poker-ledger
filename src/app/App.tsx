@@ -67,7 +67,9 @@ export function App() {
                 <Route path="/groups" element={<GroupsPage />} />
                 <Route path="/groups/new" element={<CreateGroupPage />} />
                 <Route path="/group/:id" element={<GroupPage />} />
+                <Route path="/groups/:id" element={<GroupPage />} />
                 <Route path="/game/:id" element={<GamePage />} />
+                <Route path="/games/:id" element={<GamePage />} />
 
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
@@ -78,6 +80,16 @@ export function App() {
                   <Route index element={<Navigate to="entries" replace />} />
                   <Route path="participants" element={<SessionParticipantsPage />} />
                   <Route path="entries" element={<SessionEntriesPage />} />
+                  <Route path="cashout" element={<SessionCashoutsPage />} />
+                  <Route path="settlement" element={<SessionSettlementPage />} />
+                  <Route path="export" element={<SessionExportPage />} />
+                  <Route path="audit" element={<SessionAuditPage />} />
+                </Route>
+                <Route path="/sessions/:id" element={<SessionErrorBoundary><SessionLayout /></SessionErrorBoundary>}>
+                  <Route index element={<Navigate to="entries" replace />} />
+                  <Route path="participants" element={<SessionParticipantsPage />} />
+                  <Route path="entries" element={<SessionEntriesPage />} />
+                  <Route path="cashouts" element={<SessionCashoutsPage />} />
                   <Route path="cashout" element={<SessionCashoutsPage />} />
                   <Route path="settlement" element={<SessionSettlementPage />} />
                   <Route path="export" element={<SessionExportPage />} />

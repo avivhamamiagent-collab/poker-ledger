@@ -6,7 +6,9 @@ export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
   return (
     <div
       className={cn(
-        'rounded-xl border border-zinc-200 bg-white text-zinc-950 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50',
+        'rounded-xl border border-tertiary/15 bg-surface-container/80 text-on-surface shadow-[0_18px_50px_rgba(0,0,0,0.34)] backdrop-blur-xl transition-colors',
+        'before:pointer-events-none before:absolute before:inset-0 before:rounded-xl before:bg-[linear-gradient(180deg,rgba(255,255,255,0.06),transparent_44%)]',
+        'relative overflow-hidden',
         className,
       )}
       {...props}
@@ -23,7 +25,7 @@ export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHead
 }
 
 export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn('text-sm text-zinc-500 dark:text-zinc-400', className)} {...props} />
+  return <p className={cn('text-sm leading-6 text-on-surface-variant', className)} {...props} />
 }
 
 export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
@@ -33,4 +35,3 @@ export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDi
 export function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn('flex items-center p-4 pt-0', className)} {...props} />
 }
-

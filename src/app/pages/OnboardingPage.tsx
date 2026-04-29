@@ -19,17 +19,27 @@ export function OnboardingPage() {
   }
 
   return (
-    <Card className="border-white/10 bg-white/5 text-zinc-50">
-      <CardHeader>
-        <CardTitle className="text-2xl">התחלה מהירה (2 דקות)</CardTitle>
-        <CardDescription className="text-zinc-300">פותחים שולחן ראשון ומתקדמים שלב-שלב עד סגירה.</CardDescription>
+    <Card className="gold-bezel">
+      <CardHeader className="items-center text-center">
+        <div className="chip-stage relative mb-2 h-24 w-24">
+          <div className="spinning-chip-flat absolute inset-1 rounded-full" />
+        </div>
+        <CardTitle className="text-2xl font-black">התחלה מהירה (2 דקות)</CardTitle>
+        <CardDescription>פותחים שולחן ראשון ומתקדמים שלב-שלב עד סגירה.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <ul className="list-disc pr-5 text-sm text-zinc-200">
-          <li>מוסיפים משתתפים</li>
-          <li>רושמים כניסות וריבאים</li>
-          <li>רושמים יציאות וסוגרים ערב</li>
-        </ul>
+      <CardContent className="space-y-4">
+        <div className="grid gap-2">
+          {[
+            ['group_add', 'מוסיפים משתתפים'],
+            ['payments', 'רושמים כניסות וריבאים'],
+            ['task_alt', 'רושמים יציאות וסוגרים ערב'],
+          ].map(([icon, text]) => (
+            <div key={text} className="flex items-center gap-3 rounded-xl border border-tertiary/12 bg-black/14 p-3 text-sm text-on-surface">
+              <span className="material-symbols-outlined text-tertiary">{icon}</span>
+              <span>{text}</span>
+            </div>
+          ))}
+        </div>
         <div className="flex gap-2">
           <Button onClick={onStart}>פתח שולחן</Button>
           <Button variant="secondary" onClick={() => nav('/')}>דלג</Button>

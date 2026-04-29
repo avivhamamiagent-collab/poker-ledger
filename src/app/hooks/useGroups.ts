@@ -13,15 +13,18 @@ export function useGroups() {
     setError(null)
     try {
       setGroups(await store.listGroups())
-    } catch (e: any) {
-      setError(e?.message || 'Failed to load groups')
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'לא הצלחנו לטעון קבוצות')
     } finally {
       setLoading(false)
     }
   }, [store])
 
   React.useEffect(() => {
-    refresh()
+    const timer = window.setTimeout(() => {
+      refresh().catch(() => {})
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [refresh])
 
   return { groups, setGroups, loading, error, refresh }

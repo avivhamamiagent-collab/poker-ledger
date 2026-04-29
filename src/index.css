@@ -20,7 +20,10 @@ body {
   margin: 0;
   min-width: 320px;
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  background: #041710;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(233, 195, 73, 0.08), transparent 28rem),
+    radial-gradient(circle at 85% 18%, rgba(0, 255, 136, 0.08), transparent 24rem),
+    linear-gradient(180deg, #041710 0%, #071b13 42%, #030b08 100%);
   color: #d1e8dc;
 }
 
@@ -48,6 +51,36 @@ button {
 
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+.felt-texture {
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px),
+    radial-gradient(circle at 80% 0%, rgba(233, 195, 73, 0.05), transparent 18rem),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0));
+  background-size: 16px 16px, auto, auto;
+}
+
+.gold-bezel {
+  position: relative;
+}
+
+.gold-bezel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(233, 195, 73, 0.5), rgba(233, 195, 73, 0.08), rgba(120, 255, 190, 0.18));
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.chip-face {
+  background:
+    radial-gradient(circle, #e9c349 0 36%, #513d08 37% 43%, #e9c349 44% 58%, #9a7413 59% 100%);
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.26), inset 0 -4px 8px rgba(0, 0, 0, 0.36), 0 10px 24px rgba(233, 195, 73, 0.14);
 }
 
 @keyframes shimmer {
@@ -126,6 +159,37 @@ button {
   }
 }
 
+@keyframes chipSpin3d {
+  0% {
+    transform: rotateZ(0deg) rotateY(-16deg) rotateX(10deg);
+  }
+  50% {
+    transform: rotateZ(180deg) rotateY(16deg) rotateX(10deg);
+  }
+  100% {
+    transform: rotateZ(360deg) rotateY(-16deg) rotateX(10deg);
+  }
+}
+
+@keyframes chipFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes orbitSpark {
+  0% {
+    transform: rotate(0deg) translateX(58px) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(58px) rotate(-360deg);
+  }
+}
+
 /* Ambient glow helper */
 .casino-ambient-glow {
   position: fixed;
@@ -146,4 +210,118 @@ button {
   border-radius: 9999px;
   filter: blur(120px);
   opacity: 0.4;
+}
+
+.login-shell {
+  background:
+    radial-gradient(circle at 20% 0%, rgba(233, 195, 73, 0.14), transparent 24rem),
+    radial-gradient(circle at 80% 20%, rgba(52, 211, 153, 0.12), transparent 22rem),
+    linear-gradient(180deg, #03100b 0%, #061811 48%, #020705 100%);
+}
+
+.login-grid {
+  background-image:
+    linear-gradient(rgba(233, 195, 73, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(233, 195, 73, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(circle at center, black, transparent 72%);
+}
+
+.glass-panel {
+  border: 1px solid rgba(233, 195, 73, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.035)),
+    rgba(4, 23, 16, 0.58);
+}
+
+.brand-glow {
+  text-shadow: 0 0 34px rgba(233, 195, 73, 0.2), 0 0 80px rgba(16, 185, 129, 0.1);
+}
+
+.chip-stage {
+  animation: chipFloat 3.2s ease-in-out infinite;
+  perspective: 900px;
+}
+
+.spinning-chip {
+  position: relative;
+  transform-style: preserve-3d;
+  animation: chipSpin3d 1.65s linear infinite;
+}
+
+.spinning-chip-flat {
+  animation: chipSpin3d 1.65s linear infinite;
+  background:
+    conic-gradient(from 10deg, #e9c349 0 10%, #5c4207 10% 16%, #f6df7c 16% 28%, #9a7413 28% 36%, #e9c349 36% 52%, #5c4207 52% 59%, #f6df7c 59% 74%, #9a7413 74% 84%, #e9c349 84% 100%);
+  box-shadow:
+    inset 0 0 0 10px rgba(4, 23, 16, 0.68),
+    inset 0 0 0 18px rgba(233, 195, 73, 0.94),
+    inset 0 0 0 31px rgba(4, 23, 16, 0.74),
+    inset 0 0 0 38px rgba(233, 195, 73, 0.96),
+    0 28px 88px rgba(233, 195, 73, 0.28);
+}
+
+.spinning-chip::before,
+.spinning-chip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  backface-visibility: hidden;
+  background:
+    conic-gradient(from 12deg, #e9c349 0 11%, #4d3806 11% 17%, #e9c349 17% 28%, #f6df7c 28% 34%, #9a7413 34% 45%, #e9c349 45% 58%, #4d3806 58% 64%, #f6df7c 64% 76%, #9a7413 76% 87%, #e9c349 87% 100%);
+  box-shadow:
+    inset 0 0 0 12px rgba(4, 23, 16, 0.7),
+    inset 0 0 0 20px rgba(233, 195, 73, 0.9),
+    inset 0 0 0 34px rgba(4, 23, 16, 0.74),
+    inset 0 0 0 40px rgba(233, 195, 73, 0.95),
+    0 30px 90px rgba(233, 195, 73, 0.22);
+  z-index: 0;
+}
+
+.spinning-chip::after {
+  transform: translateZ(-10px) rotateY(180deg);
+  filter: brightness(0.78);
+  z-index: -1;
+}
+
+.spinning-chip .chip-face {
+  z-index: 2;
+}
+
+.spinning-chip-edge {
+  position: absolute;
+  inset: 8px;
+  border-radius: 9999px;
+  transform: translateZ(-5px);
+  background: linear-gradient(90deg, #5c4207, #f2d15d, #5c4207);
+  filter: blur(2px);
+  z-index: 1;
+}
+
+.orbit-spark {
+  animation: orbitSpark 2.4s linear infinite;
+}
+
+.card-drift {
+  animation: chipFloat 4s ease-in-out infinite;
+}
+
+.chip-orbit {
+  border-radius: 9999px;
+  border: 1px solid rgba(233, 195, 73, 0.22);
+}
+
+.chip-orbit::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  height: 14px;
+  width: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 9999px;
+  background: #e9c349;
+  box-shadow: 0 0 18px rgba(233, 195, 73, 0.7);
+  animation: orbitSpark 2s linear infinite;
 }

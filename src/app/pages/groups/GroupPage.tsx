@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { CalendarPlus, MailPlus, Users } from 'lucide-react'
 
 import { Button } from '../../../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card'
@@ -39,7 +40,10 @@ export function GroupPage() {
   }, [id, store])
 
   React.useEffect(() => {
-    refresh().catch(() => {})
+    const timer = window.setTimeout(() => {
+      refresh().catch(() => {})
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [refresh])
 
   async function invite(e: React.FormEvent) {
@@ -50,8 +54,8 @@ export function GroupPage() {
       await store.inviteGroupMember(id, inviteEmail.trim())
       setInviteEmail('')
       toast.push({ title: 'Invite sent', description: 'They will see it after signing in with that email.' })
-    } catch (err: any) {
-      toast.push({ title: 'Invite failed', description: String(err?.message ?? err) })
+    } catch (err: unknown) {
+      toast.push({ title: 'ההזמנה נכשלה', description: err instanceof Error ? err.message : String(err) })
     } finally {
       setInviting(false)
     }
@@ -63,7 +67,7 @@ export function GroupPage() {
 
     const startsAtMs = newStartsAt ? new Date(newStartsAt).getTime() : NaN
     if (!Number.isFinite(startsAtMs)) {
-      toast.push({ title: 'Pick a date & time' })
+      toast.push({ title: 'בחרו תאריך ושעה' })
       return
     }
 
@@ -79,9 +83,9 @@ export function GroupPage() {
       setNewStartsAt('')
       setNewLocation('')
       await refresh()
-      toast.push({ title: 'Game created', description: 'Invites & notifications sent to the group.' })
-    } catch (err: any) {
-      toast.push({ title: 'Failed to create game', description: String(err?.message ?? err) })
+      toast.push({ title: 'המשחק נוצר', description: 'הזמנות והתראות נשלחו לקבוצה.' })
+    } catch (err: unknown) {
+      toast.push({ title: 'יצירת המשחק נכשלה', description: err instanceof Error ? err.message : String(err) })
     } finally {
       setCreating(false)
     }
@@ -90,20 +94,31 @@ export function GroupPage() {
   if (!id) return null
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-5">
+      <section className="gold-bezel overflow-hidden rounded-2xl bg-surface-container-low/78 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.34)]">
+        <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-lg font-semibold">{group?.name ?? 'Group'}</h1>
-          <p className="text-sm text-zinc-500">Plan games, RSVP, then run the ledger.</p>
+            <div className="text-xs font-semibold text-tertiary">קבוצת משחק</div>
+            <h1 className="text-2xl font-black text-on-surface">{group?.name ?? 'קבוצה'}</h1>
+            <p className="mt-1 text-sm leading-6 text-on-surface-variant">מתכננים משחק, אוספים RSVP ואז פותחים לדג׳ר משותף.</p>
         </div>
-        <Link to="/groups" className="text-sm text-zinc-600 underline underline-offset-4">
-          Back
+          <Link to="/groups" className="rounded-lg border border-tertiary/16 px-3 py-2 text-sm font-semibold text-tertiary">
+            חזרה
         </Link>
-      </div>
+        </div>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          <GroupStat label="חברים" value={String(members.length)} />
+          <GroupStat label="משחקים" value={String(games.length)} />
+          <GroupStat label="קרוב" value={games[0] ? new Date(games[0].startsAt).toLocaleDateString('he-IL') : '-'} />
+        </div>
+      </section>
 
       <Card>
         <CardHeader>
-          <CardTitle>Invite a member</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <MailPlus className="h-5 w-5 text-tertiary" />
+            הזמנת חבר
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={invite} className="flex gap-2">
@@ -116,30 +131,31 @@ export function GroupPage() {
               required
             />
             <Button type="submit" disabled={inviting}>
-              {inviting ? 'Sending…' : 'Invite'}
+              {inviting ? 'שולח…' : 'הזמנה'}
             </Button>
           </form>
-          <p className="mt-2 text-xs text-zinc-500">
-            Tip: they must sign in with the same email to accept.
-          </p>
+          <p className="mt-2 text-xs leading-5 text-on-surface-variant">החבר צריך להתחבר עם אותו אימייל כדי לאשר את ההזמנה.</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Members</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5 text-emerald-300" />
+            חברים
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-sm text-zinc-500">Loading…</div>
+            <div className="text-sm text-on-surface-variant">טוען…</div>
           ) : members.length === 0 ? (
-            <div className="text-sm text-zinc-500">No members (yet).</div>
+            <div className="text-sm text-on-surface-variant">אין חברים עדיין.</div>
           ) : (
             <div className="grid grid-cols-2 gap-2">
               {members.map((m) => (
-                <div key={m.userId} className="rounded-md border border-zinc-200 p-3 text-sm">
-                  <div className="font-medium">{m.role === 'owner' ? 'Owner' : 'Member'}</div>
-                  <div className="text-xs text-zinc-500">Joined {new Date(m.joinedAt).toLocaleDateString()}</div>
+                <div key={m.userId} className="rounded-xl border border-tertiary/14 bg-black/14 p-3 text-sm">
+                  <div className="font-medium">{m.role === 'owner' ? 'מנהל' : 'חבר'}</div>
+                  <div className="text-xs text-on-surface-variant">הצטרף {new Date(m.joinedAt).toLocaleDateString('he-IL')}</div>
                 </div>
               ))}
             </div>
@@ -149,15 +165,18 @@ export function GroupPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Create a game</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarPlus className="h-5 w-5 text-tertiary" />
+            יצירת משחק
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={createGame} className="flex flex-col gap-2">
-            <Input placeholder="Title (optional)" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
+            <Input placeholder="שם המשחק (אופציונלי)" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} />
             <Input type="datetime-local" value={newStartsAt} onChange={(e) => setNewStartsAt(e.target.value)} required />
-            <Input placeholder="Location (optional)" value={newLocation} onChange={(e) => setNewLocation(e.target.value)} />
+            <Input placeholder="מיקום (אופציונלי)" value={newLocation} onChange={(e) => setNewLocation(e.target.value)} />
             <Button type="submit" disabled={creating}>
-              {creating ? 'Creating…' : 'Create game'}
+              {creating ? 'יוצר…' : 'צור משחק'}
             </Button>
           </form>
         </CardContent>
@@ -165,28 +184,28 @@ export function GroupPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Upcoming games</CardTitle>
+          <CardTitle>משחקים קרובים</CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-sm text-zinc-500">Loading…</div>
+            <div className="text-sm text-on-surface-variant">טוען…</div>
           ) : games.length === 0 ? (
-            <div className="text-sm text-zinc-500">No games yet. Create one above.</div>
+            <div className="text-sm text-on-surface-variant">אין משחקים עדיין. אפשר ליצור אחד למעלה.</div>
           ) : (
             <div className="flex flex-col gap-2">
               {games.map((g) => (
                 <Link
                   key={g.id}
                   to={`/game/${g.id}`}
-                  className="rounded-md border border-zinc-200 bg-white p-3 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-900"
+                  className="rounded-xl border border-tertiary/14 bg-black/14 p-3 transition-colors hover:border-tertiary/30 hover:bg-surface-container-high/70"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="font-medium">{g.title || 'Game'}</div>
-                      <div className="text-sm text-zinc-500">{new Date(g.startsAt).toLocaleString()}</div>
-                      {g.location ? <div className="text-sm text-zinc-500">{g.location}</div> : null}
+                      <div className="font-medium">{g.title || 'משחק'}</div>
+                      <div className="text-sm text-on-surface-variant">{new Date(g.startsAt).toLocaleString('he-IL')}</div>
+                      {g.location ? <div className="text-sm text-on-surface-variant">{g.location}</div> : null}
                     </div>
-                    <div className="text-xs text-zinc-500">Tap</div>
+                    <div className="text-xs text-tertiary">פתיחה</div>
                   </div>
                 </Link>
               ))}
@@ -194,6 +213,15 @@ export function GroupPage() {
           )}
         </CardContent>
       </Card>
+    </div>
+  )
+}
+
+function GroupStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-white/8 bg-black/16 p-3">
+      <div className="text-[11px] font-semibold text-on-surface-variant">{label}</div>
+      <div className="mt-1 truncate text-sm font-black tabular-nums text-on-surface">{value}</div>
     </div>
   )
 }

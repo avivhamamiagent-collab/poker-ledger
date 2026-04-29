@@ -26,7 +26,10 @@ export function GroupsPage() {
   }, [store])
 
   React.useEffect(() => {
-    loadInvites().catch(() => {})
+    const timer = window.setTimeout(() => {
+      loadInvites().catch(() => {})
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [loadInvites])
 
   async function respond(inviteId: string, status: 'accepted' | 'declined') {
@@ -34,8 +37,8 @@ export function GroupsPage() {
       await store.respondToInvite(inviteId, status)
       await Promise.all([refresh(), loadInvites()])
       toast.push({ title: status === 'accepted' ? 'הצטרפת לקבוצה' : 'ההזמנה נדחתה' })
-    } catch (err: any) {
-      toast.push({ title: 'נכשל', description: String(err?.message ?? err) })
+    } catch (err: unknown) {
+      toast.push({ title: 'נכשל', description: err instanceof Error ? err.message : String(err) })
     }
   }
 
@@ -109,9 +112,23 @@ export function GroupsPage() {
           ) : null}
 
           {loading ? (
-            <div className="text-body-sm font-body-sm text-on-surface-variant">טוען…</div>
+            <div className="rounded-xl border border-tertiary/14 bg-surface-container/70 p-4 text-body-sm font-body-sm text-on-surface-variant">טוען…</div>
           ) : filtered.length === 0 ? (
-            <div className="text-body-sm font-body-sm text-on-surface-variant">אין עדיין קבוצות.</div>
+            <div className="rounded-2xl border border-dashed border-tertiary/22 bg-surface-container/70 p-5 text-center shadow-[0_14px_40px_rgba(0,0,0,0.24)]">
+              <div className="chip-face mx-auto mb-4 h-16 w-16 rounded-full" />
+              <h3 className="text-lg font-black text-on-surface">אין עדיין קבוצות</h3>
+              <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-on-surface-variant">
+                קבוצה היא המקום לתכנן משחקים, לשלוח הזמנות ולפתוח לדג׳ר משותף לערב.
+              </p>
+              <button
+                type="button"
+                onClick={() => nav('/groups/new')}
+                className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-tertiary/25 bg-[linear-gradient(180deg,#e9c349,#b88c17)] px-4 py-2 text-sm font-semibold text-on-tertiary shadow-[0_12px_30px_rgba(233,195,73,0.16)] active:scale-[0.98]"
+              >
+                <span className="material-symbols-outlined text-sm">add</span>
+                צור קבוצה ראשונה
+              </button>
+            </div>
           ) : (
             <div className="flex flex-col gap-stack-gap">
               {filtered.map((g) => (
