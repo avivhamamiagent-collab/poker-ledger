@@ -26,47 +26,47 @@ export function RosterPage() {
     setRoster((prev) => [...prev, p].sort((a, b) => a.name.localeCompare(b.name)))
     setName('')
     setPhone('')
-    toast.push({ title: 'Player added', description: p.name })
+    toast.push({ title: 'שחקן נוסף', description: p.name })
   }
 
   async function edit(p: Player) {
-    const nextName = window.prompt('Edit name:', p.name)
+    const nextName = window.prompt('עריכת שם:', p.name)
     if (nextName === null) return
-    const nextPhone = window.prompt('Edit phone (optional):', p.phone || '')
+    const nextPhone = window.prompt('עריכת טלפון (אופציונלי):', p.phone || '')
     if (nextPhone === null) return
     const next: Player = { ...p, name: nextName.trim() || p.name, phone: nextPhone.trim() || undefined }
     await store.putPlayer(next)
     setRoster((prev) => prev.map((x) => (x.id === p.id ? next : x)).sort((a, b) => a.name.localeCompare(b.name)))
-    toast.push({ title: 'Player updated', description: next.name })
+    toast.push({ title: 'שחקן עודכן', description: next.name })
   }
 
   async function remove(p: Player) {
-    if (!window.confirm('Remove from roster?')) return
+    if (!window.confirm('להסיר מהרוסטר?')) return
     await store.deletePlayer(p.id)
     setRoster((prev) => prev.filter((x) => x.id !== p.id))
-    toast.push({ title: 'Player removed', description: p.name })
+    toast.push({ title: 'שחקן הוסר', description: p.name })
   }
 
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl font-semibold tracking-tight">Roster</h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Your regular crew. Names + optional phone.</p>
+        <h1 className="text-xl font-semibold tracking-tight">רוסטר</h1>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">הקבוצה הקבועה שלך. שם + טלפון אופציונלי.</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Add player</CardTitle>
-          <CardDescription>We’ll use this list across sessions.</CardDescription>
+          <CardTitle>הוספת שחקן</CardTitle>
+          <CardDescription>הרשימה הזו תשמש בכל השולחנות.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-2">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <Input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-            <Input placeholder="Phone (optional)" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <Input placeholder="שם" value={name} onChange={(e) => setName(e.target.value)} />
+            <Input placeholder="טלפון (אופציונלי)" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
           <Button onClick={add} disabled={!name.trim()}>
             <UserPlus className="h-4 w-4" />
-            Add
+            הוספה
           </Button>
         </CardContent>
       </Card>
@@ -77,14 +77,14 @@ export function RosterPage() {
         {loading ? (
           <Card>
             <CardHeader>
-              <CardTitle>Loading…</CardTitle>
+              <CardTitle>טוען…</CardTitle>
             </CardHeader>
           </Card>
         ) : roster.length === 0 ? (
           <Card>
             <CardHeader>
-              <CardTitle>No players yet</CardTitle>
-              <CardDescription>Add the first player above.</CardDescription>
+              <CardTitle>אין עדיין שחקנים</CardTitle>
+              <CardDescription>הוסיפו את הראשון למעלה.</CardDescription>
             </CardHeader>
           </Card>
         ) : (
@@ -99,11 +99,11 @@ export function RosterPage() {
               <CardContent className="flex items-center justify-end gap-2">
                 <Button variant="secondary" onClick={() => edit(p)}>
                   <Pencil className="h-4 w-4" />
-                  Edit
+                  עריכה
                 </Button>
                 <Button variant="ghost" onClick={() => remove(p)} className="text-red-600 hover:text-red-700">
                   <Trash2 className="h-4 w-4" />
-                  Remove
+                  הסרה
                 </Button>
               </CardContent>
             </Card>
@@ -113,4 +113,3 @@ export function RosterPage() {
     </div>
   )
 }
-

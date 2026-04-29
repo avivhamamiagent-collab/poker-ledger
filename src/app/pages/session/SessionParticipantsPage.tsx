@@ -12,12 +12,17 @@ import { useRoster } from '../../hooks/useRoster'
 import { useSession } from '../../hooks/useSession'
 import { useStore } from '../../store-context'
 import { useToast } from '../../../components/ui/use-toast'
+import { OnboardingBanner } from '../../onboarding/OnboardingBanner'
+import { useNavigate } from 'react-router-dom'
+import { useOnboarding } from '../../onboarding/useOnboarding'
 
 export function SessionParticipantsPage() {
   const store = useStore()
   const toast = useToast()
+  const nav = useNavigate()
   const { roster, refresh: refreshRoster } = useRoster()
   const { session, loading, error, persist } = useSession()
+  const ob = useOnboarding(session)
 
   const [name, setName] = React.useState('')
   const [phone, setPhone] = React.useState('')
@@ -26,7 +31,7 @@ export function SessionParticipantsPage() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Loading…</CardTitle>
+          <CardTitle>טוען…</CardTitle>
         </CardHeader>
       </Card>
     )
@@ -35,7 +40,7 @@ export function SessionParticipantsPage() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Couldn’t load participants</CardTitle>
+          <CardTitle>לא הצלחנו לטעון משתתפים</CardTitle>
           {error && <CardDescription>{error}</CardDescription>}
         </CardHeader>
       </Card>
@@ -59,32 +64,48 @@ export function SessionParticipantsPage() {
     await persist(addParticipant(s, p.id, p.name))
     setName('')
     setPhone('')
-    toast.push({ title: 'Participant added', description: p.name })
+    toast.push({ title: 'משתתף נוסף', description: p.name })
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Participants</CardTitle>
-        <CardDescription>Select players included in entries, cashouts and settlement.</CardDescription>
+        <CardTitle>משתתפים</CardTitle>
+        <CardDescription>בחרו מי נכנס לחישוב כניסות, סגירות והפרש.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {ob.obActive && ob.state.activeSessionId === s.id && !ob.state.done ? (
+          <OnboardingBanner
+            stepLabel="התחלה מהירה • שלב 1/4"
+            title="מוסיפים משתתפים"
+            body="תוסיף לפחות 2 שחקנים. אפשר ‘הוספה + בחירה’ וזה נשמר לרוסטר לפעמים הבאות."
+            primaryLabel="המשך לכניסות"
+            primaryDisabled={s.participantIds.length < 2}
+            onPrimary={() => {
+              ob.setStep('entries')
+              nav(`/session/${s.id}/entries?ob=1`)
+            }}
+            secondaryLabel="דלג"
+            onSecondary={() => ob.complete()}
+          />
+        ) : null}
+
         <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-900/30">
-          <div className="text-sm font-semibold">Quick add to roster</div>
+          <div className="text-sm font-semibold">הוספה מהירה לרוסטר</div>
           <div className="mt-2 grid gap-2 sm:grid-cols-2">
-            <Input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-            <Input placeholder="Phone (optional)" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <Input placeholder="שם" value={name} onChange={(e) => setName(e.target.value)} />
+            <Input placeholder="טלפון (אופציונלי)" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
           <div className="mt-2">
             <Button onClick={quickAddAndSelect} disabled={!name.trim()}>
               <UserPlus className="h-4 w-4" />
-              Add & select
+              הוספה + בחירה
             </Button>
           </div>
         </div>
 
         {roster.length === 0 ? (
-          <div className="text-sm text-zinc-500 dark:text-zinc-400">Your roster is empty. Add someone above.</div>
+          <div className="text-sm text-zinc-500 dark:text-zinc-400">הרוסטר ריק. הוסיפו מישהו למעלה.</div>
         ) : (
           <div className="grid gap-2">
             {roster.map((p) => {
@@ -115,11 +136,10 @@ export function SessionParticipantsPage() {
 
         {s.participantIds.length > 0 && (
           <div className="text-xs text-zinc-500 dark:text-zinc-400">
-            Active: {s.participantIds.length} participants
+            פעילים: {s.participantIds.length} משתתפים
           </div>
         )}
       </CardContent>
     </Card>
   )
 }
-

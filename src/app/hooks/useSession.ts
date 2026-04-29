@@ -2,10 +2,27 @@ import * as React from 'react'
 import { useParams } from 'react-router-dom'
 import type { Session } from '../../domain/types'
 import { useStore } from '../store-context'
+import { useSessionContext } from '../pages/session/session-context'
 
 export function useSession() {
   const { id } = useParams()
   const store = useStore()
+  const ctx = useSessionContext()
+
+  // If we're inside a SessionProvider (SessionLayout level), use the shared context
+  if (ctx !== undefined) {
+    return {
+      id,
+      session: ctx,
+      setSession: () => {},
+      loading: false,
+      error: null,
+      refresh: () => Promise.resolve(),
+      persist: async (_next: Session) => {},
+    }
+  }
+
+  // Otherwise, fall back to direct loading
   const [session, setSession] = React.useState<Session | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
@@ -39,4 +56,3 @@ export function useSession() {
 
   return { id, session, setSession, loading, error, refresh, persist }
 }
-

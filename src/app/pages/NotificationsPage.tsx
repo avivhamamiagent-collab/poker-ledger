@@ -16,16 +16,16 @@ export function NotificationsPage() {
       await store.markNotificationRead(id)
       await refresh()
     } catch (err: any) {
-      toast.push({ title: 'Failed', description: String(err?.message ?? err) })
+      toast.push({ title: 'נכשל', description: String(err?.message ?? err) })
     }
   }
 
   async function enablePush() {
     try {
       await push.enable()
-      toast.push({ title: 'Push enabled', description: 'You’ll get notifications for invites and new games.' })
+      toast.push({ title: 'התראות הופעלו', description: 'תקבל התראות על הזמנות ומשחקים חדשים.' })
     } catch (err: any) {
-      toast.push({ title: 'Push setup failed', description: String(err?.message ?? err) })
+      toast.push({ title: 'הפעלת ההתראות נכשלה', description: String(err?.message ?? err) })
     }
   }
 
@@ -43,20 +43,20 @@ export function NotificationsPage() {
         <CardContent>
           {!push.supported ? (
             <p className="text-sm text-zinc-500">
-              Push isn’t available on this browser/device (or VAPID key isn’t configured). You’ll still see in-app notifications here.
+              Push לא זמין בדפדפן/מכשיר הזה (או שחסר VAPID key). עדיין תראה התראות בתוך האפליקציה.
             </p>
           ) : push.permission === 'granted' ? (
             <p className="text-sm text-zinc-500">Push is enabled.</p>
           ) : (
             <div className="flex items-center justify-between gap-3">
-              <p className="text-sm text-zinc-500">Enable push to get game/invite alerts.</p>
+              <p className="text-sm text-zinc-500">הפעלה push to get game/invite alerts.</p>
               <Button variant="secondary" onClick={enablePush}>
-                Enable
+                הפעלה
               </Button>
             </div>
           )}
           <p className="mt-2 text-xs text-zinc-500">
-            iOS/Safari support depends on iOS version and “Add to Home Screen”. When unavailable, the app falls back to in-app notifications.
+            תמיכת iOS/Safari תלויה בגרסת iOS וב־הוספה למסך הבית. כשזה לא זמין, האפליקציה תציג התראות פנימיות.
           </p>
         </CardContent>
       </Card>

@@ -41,9 +41,9 @@ export function GamePage() {
     try {
       await store.setMyRsvp(id, status)
       await refresh()
-      toast.push({ title: 'RSVP saved' })
+      toast.push({ title: 'התשובה נשמרה' })
     } catch (err: any) {
-      toast.push({ title: 'Failed to RSVP', description: String(err?.message ?? err) })
+      toast.push({ title: 'שמירת התשובה נכשלה', description: String(err?.message ?? err) })
     }
   }
 
@@ -59,9 +59,9 @@ export function GamePage() {
     try {
       await store.setGameParticipants(id, Array.from(next))
       await refresh()
-      toast.push({ title: 'Participants updated' })
+      toast.push({ title: 'המשתתפים עודכנו' })
     } catch (err: any) {
-      toast.push({ title: 'Failed', description: String(err?.message ?? err) })
+      toast.push({ title: 'נכשל', description: String(err?.message ?? err) })
     }
   }
 
@@ -71,7 +71,7 @@ export function GamePage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold">{game?.title || 'Game'}</h1>
+          <h1 className="text-lg font-semibold">{game?.title || 'משחק'}</h1>
           {game?.startsAt ? <p className="text-sm text-zinc-500">{new Date(game.startsAt).toLocaleString()}</p> : null}
           {game?.location ? <p className="text-sm text-zinc-500">{game.location}</p> : null}
         </div>
@@ -98,7 +98,7 @@ export function GamePage() {
               No
             </Button>
           </div>
-          <p className="mt-2 text-xs text-zinc-500">This is shared with the group.</p>
+          <p className="mt-2 text-xs text-zinc-500">זה משותף עם הקבוצה.</p>
         </CardContent>
       </Card>
 
@@ -130,9 +130,9 @@ export function GamePage() {
         </CardHeader>
         <CardContent>
           {!isHost ? (
-            <div className="text-sm text-zinc-500">Only the host can select final participants.</div>
+            <div className="text-sm text-zinc-500">רק המארח יכול לבחור את המשתתפים הסופיים.</div>
           ) : (
-            <div className="text-sm text-zinc-500">Tap an RSVP card to include/exclude.</div>
+            <div className="text-sm text-zinc-500">לוחצים על כרטיס תשובה כדי לכלול/להוציא.</div>
           )}
 
           <div className="mt-3 grid grid-cols-2 gap-2">
@@ -153,7 +153,7 @@ export function GamePage() {
                   disabled={!clickable}
                 >
                   <div className="font-medium">{r.status.toUpperCase()}</div>
-                  <div className="text-xs opacity-80">{selected ? 'Selected' : 'Not selected'}</div>
+                  <div className="text-xs opacity-80">{selected ? 'נבחר' : 'Not selected'}</div>
                 </button>
               )
             })}

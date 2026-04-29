@@ -28,7 +28,7 @@ export function SessionsPage() {
   }
 
   async function onCreate() {
-    const title = window.prompt('Session title (optional):') || undefined
+    const title = window.prompt('שם לשולחן (אופציונלי):') || undefined
     const s = createSession(title)
     await persist(s)
     nav(`/session/${s.id}`)
@@ -45,46 +45,47 @@ export function SessionsPage() {
     <div className="space-y-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Sessions</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">Fast cash-game tracking. Local-first. ILS.</p>
+          <h1 className="text-xl font-semibold tracking-tight">שולחנות</h1>
+          <p className="text-sm text-zinc-300">ניהול מהיר של כניסות, ריבאים וסגירת ערב.</p>
         </div>
         <Button onClick={onCreate} className="shrink-0">
           <CalendarPlus className="h-4 w-4" />
-          New
+          שולחן חדש
         </Button>
       </div>
 
       {install.canInstall ? (
-        <div className="rounded-xl border border-zinc-200 bg-white p-3 text-sm">
+        <div className="rounded-xl border border-white/10 bg-white/5 p-3 text-sm">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <div className="font-medium">Install Poker Ledger</div>
-              <div className="text-xs text-zinc-500">Add to your home screen for a faster, app-like experience.</div>
+              <div className="font-medium">להתקין על המסך הראשי</div>
+              <div className="text-xs text-zinc-500">גישה מהירה יותר, כמו אפליקציה אמיתית.</div>
             </div>
             <Button variant="secondary" onClick={() => install.prompt().catch(() => {})}>
-              Install
+              התקנה
             </Button>
           </div>
         </div>
       ) : null}
 
-      {error && <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>}
+      {error && <div className="rounded-xl border border-red-400/20 bg-red-500/10 p-3 text-sm text-red-200">{error}</div>}
 
       {loading ? (
         <Card>
           <CardHeader>
-            <CardTitle>Loading…</CardTitle>
-            <CardDescription>Fetching sessions from storage.</CardDescription>
+            <CardTitle>טוען…</CardTitle>
+            <CardDescription>מושך נתונים מהאחסון.</CardDescription>
           </CardHeader>
         </Card>
       ) : sessions.length === 0 ? (
         <Card>
           <CardHeader>
-            <CardTitle>No sessions yet</CardTitle>
-            <CardDescription>Create your first session and start tracking buy-ins, rebuys and cashouts.</CardDescription>
+            <CardTitle>אין עדיין שולחנות</CardTitle>
+            <CardDescription>אפשר להתחיל ב״2 דקות״ מודרך, או לפתוח שולחן לבד.</CardDescription>
           </CardHeader>
-          <CardContent>
-            <Button onClick={onCreate}>Create a session</Button>
+          <CardContent className="flex flex-wrap gap-2">
+            <Button onClick={() => nav('/onboarding')}>התחלה מהירה (2 דקות)</Button>
+            <Button variant="secondary" onClick={onCreate}>פתיחת שולחן ראשון</Button>
           </CardContent>
         </Card>
       ) : (
@@ -93,18 +94,18 @@ export function SessionsPage() {
             <Card key={s.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center justify-between gap-3">
-                  <span className="truncate">{s.title || 'Untitled session'}</span>
+                  <span className="truncate">{s.title || 'שולחן ללא שם'}</span>
                   <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">{s.dateISO}</span>
                 </CardTitle>
-                <CardDescription>{s.participantIds.length} participants</CardDescription>
+                <CardDescription>{s.participantIds.length} משתתפים</CardDescription>
               </CardHeader>
               <CardContent className="flex items-center justify-between gap-2">
                 <Button variant="secondary" onClick={() => nav(`/session/${s.id}`)}>
-                  Open
+                  פתיחה
                 </Button>
                 <Button variant="ghost" onClick={() => onDelete(s)} className="text-red-600 hover:text-red-700">
                   <Trash2 className="h-4 w-4" />
-                  Delete
+                  מחיקה
                 </Button>
               </CardContent>
             </Card>
@@ -114,8 +115,8 @@ export function SessionsPage() {
 
       <p className="text-xs text-zinc-500 dark:text-zinc-400">
         Storage:{' '}
-        <span className="font-medium">{env.storage === 'supabase' ? 'Supabase (multi-device)' : 'local IndexedDB'}</span>
-        {env.storage === 'supabase' ? null : '. Local-first by default.'}
+        <span className="font-medium">{env.storage === 'supabase' ? 'Supabase (רב-מכשירי)' : 'IndexedDB מקומי'}</span>
+        {env.storage === 'supabase' ? null : '. נשמר מקומית כברירת מחדל.'}
       </p>
     </div>
   )

@@ -4,8 +4,8 @@ import { Bell, Users, Spade, UsersRound } from 'lucide-react'
 
 import { cn } from '../../lib/utils'
 import { getEnv } from '../../config/env'
-import { supabase } from '../../data/supabase/client'
 import { useAuth } from '../auth/auth-context'
+import { RosterProvider } from '../roster/roster-context'
 
 export function AppShell() {
   const location = useLocation()
@@ -25,20 +25,22 @@ export function AppShell() {
             {env.storage === 'supabase' ? (
               <Link
                 to="/notifications"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md hover:bg-white/10"
                 aria-label="Notifications"
               >
                 <Bell className="h-4 w-4" />
               </Link>
             ) : null}
-            <div className="text-xs text-zinc-500 dark:text-zinc-400">₪ ILS</div>
+            <div className="text-xs text-zinc-300">₪ ILS</div>
             {enabled && user ? (
               <button
                 type="button"
-                className="rounded-md px-2 py-1 text-xs text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                onClick={() => supabase().auth.signOut()}
+                className="rounded-md px-2 py-1 text-xs text-zinc-200 hover:bg-white/10"
+                onClick={() => {
+                  import('../../data/supabase/client').then((m) => m.supabase().auth.signOut())
+                }}
               >
-                Sign out
+                יציאה
               </button>
             ) : null}
           </div>
@@ -46,14 +48,16 @@ export function AppShell() {
       </header>
 
       <main className={cn('container pb-24 pt-4', isSession && 'pt-3')}>
-        <Outlet />
+        <RosterProvider>
+          <Outlet />
+        </RosterProvider>
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-zinc-200 bg-white/90 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-[#070b12]/90 backdrop-blur">
         <div className="container grid grid-cols-3">
-          <BottomNavItem to="/" label="Sessions" icon={<Spade className="h-5 w-5" />} end />
-          <BottomNavItem to="/roster" label="Roster" icon={<Users className="h-5 w-5" />} />
-          <BottomNavItem to="/groups" label="Groups" icon={<UsersRound className="h-5 w-5" />} />
+          <BottomNavItem to="/groups" label="קבוצות" icon={<UsersRound className="h-5 w-5" />} />
+          <BottomNavItem to="/roster" label="רוסטר" icon={<Users className="h-5 w-5" />} />
+          <BottomNavItem to="/" label="שולחנות" icon={<Spade className="h-5 w-5" />} end />
         </div>
       </nav>
     </div>
@@ -77,8 +81,8 @@ function BottomNavItem({
       end={end}
       className={({ isActive }) =>
         cn(
-          'flex flex-col items-center justify-center gap-1 py-3 text-xs font-medium text-zinc-500',
-          isActive && 'text-zinc-950 dark:text-zinc-50',
+          'flex flex-col items-center justify-center gap-1 py-3 text-xs font-medium text-zinc-400',
+          isActive && 'text-white',
         )
       }
     >

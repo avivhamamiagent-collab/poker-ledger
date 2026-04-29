@@ -39,9 +39,9 @@ export function GroupsPage() {
       await store.createGroup(name.trim())
       setName('')
       await refresh()
-      toast.push({ title: 'Group created' })
+      toast.push({ title: 'קבוצה נוצרה' })
     } catch (err: any) {
-      toast.push({ title: 'Failed to create group', description: String(err?.message ?? err) })
+      toast.push({ title: 'יצירת קבוצה נכשלה', description: String(err?.message ?? err) })
     } finally {
       setCreating(false)
     }
@@ -51,9 +51,9 @@ export function GroupsPage() {
     try {
       await store.respondToInvite(inviteId, status)
       await Promise.all([refresh(), loadInvites()])
-      toast.push({ title: status === 'accepted' ? 'Joined group' : 'Invite declined' })
+      toast.push({ title: status === 'accepted' ? 'הצטרפת לקבוצה' : 'ההזמנה נדחתה' })
     } catch (err: any) {
-      toast.push({ title: 'Failed', description: String(err?.message ?? err) })
+      toast.push({ title: 'נכשל', description: String(err?.message ?? err) })
     }
   }
 
@@ -61,23 +61,23 @@ export function GroupsPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-end justify-between gap-3">
         <div>
-          <h1 className="text-lg font-semibold">Groups</h1>
-          <p className="text-sm text-zinc-500">Organize games with friends. Invite by email.</p>
+          <h1 className="text-lg font-semibold">קבוצות</h1>
+          <p className="text-sm text-zinc-500">ניהול משחקים עם חברים. הזמנה לפי אימייל.</p>
         </div>
         <Link to="/notifications" className="text-sm text-zinc-600 underline underline-offset-4">
-          Notifications
+          התראות
         </Link>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Create a group</CardTitle>
+          <CardTitle>יצירת קבוצה</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={createGroup} className="flex gap-2">
-            <Input placeholder="e.g. Thursday Night" value={name} onChange={(e) => setName(e.target.value)} required />
+            <Input placeholder="למשל: חמישי קבוע" value={name} onChange={(e) => setName(e.target.value)} required />
             <Button type="submit" disabled={creating}>
-              {creating ? 'Creating…' : 'Create'}
+              {creating ? 'יוצר…' : 'יצירה'}
             </Button>
           </form>
         </CardContent>
@@ -85,13 +85,13 @@ export function GroupsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Invites</CardTitle>
+          <CardTitle>הזמנות</CardTitle>
         </CardHeader>
         <CardContent>
           {invLoading ? (
-            <div className="text-sm text-zinc-500">Loading…</div>
+            <div className="text-sm text-zinc-500">טוען…</div>
           ) : invites.length === 0 ? (
-            <div className="text-sm text-zinc-500">No pending invites.</div>
+            <div className="text-sm text-zinc-500">אין הזמנות ממתינות.</div>
           ) : (
             <div className="flex flex-col gap-2">
               {invites
@@ -99,12 +99,12 @@ export function GroupsPage() {
                 .map((i) => (
                   <div key={i.id} className="flex items-center justify-between gap-2 rounded-md border border-zinc-200 p-3">
                     <div className="text-sm">
-                      <div className="font-medium">Group invite</div>
-                      <div className="text-zinc-500">To: {i.email}</div>
+                      <div className="font-medium">הזמנה לקבוצה</div>
+                      <div className="text-zinc-500">אל: {i.email}</div>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="secondary" onClick={() => respond(i.id, 'declined')}>Decline</Button>
-                      <Button size="sm" onClick={() => respond(i.id, 'accepted')}>Accept</Button>
+                      <Button size="sm" variant="secondary" onClick={() => respond(i.id, 'declined')}>דחייה</Button>
+                      <Button size="sm" onClick={() => respond(i.id, 'accepted')}>אישור</Button>
                     </div>
                   </div>
                 ))}
@@ -115,15 +115,15 @@ export function GroupsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Your groups</CardTitle>
+          <CardTitle>הקבוצות שלך</CardTitle>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-sm text-zinc-500">Loading…</div>
+            <div className="text-sm text-zinc-500">טוען…</div>
           ) : error ? (
             <div className="text-sm text-red-600">{error}</div>
           ) : groups.length === 0 ? (
-            <div className="text-sm text-zinc-500">No groups yet. Create one above.</div>
+            <div className="text-sm text-zinc-500">אין עדיין קבוצות. צרו אחת למעלה.</div>
           ) : (
             <div className="flex flex-col gap-2">
               {groups.map((g) => (
@@ -133,7 +133,7 @@ export function GroupsPage() {
                   className="rounded-md border border-zinc-200 bg-white p-3 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 dark:hover:bg-zinc-900"
                 >
                   <div className="font-medium">{g.name}</div>
-                  <div className="text-xs text-zinc-500">Updated {new Date(g.updatedAt).toLocaleString()}</div>
+                  <div className="text-xs text-zinc-500">עודכן {new Date(g.updatedAt).toLocaleString()}</div>
                 </Link>
               ))}
             </div>

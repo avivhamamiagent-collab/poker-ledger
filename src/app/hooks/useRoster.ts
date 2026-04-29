@@ -1,9 +1,22 @@
 import * as React from 'react'
 import type { Player } from '../../domain/types'
 import { useStore } from '../store-context'
+import { RosterContext } from '../roster/roster-context'
 
 export function useRoster() {
   const store = useStore()
+
+  // If we're inside a RosterProvider (AppShell level), use the shared context
+  try {
+    const ctx = React.useContext(RosterContext)
+    if (ctx) {
+      return { roster: ctx, setRoster: () => {}, loading: false, error: null, refresh: () => Promise.resolve() }
+    }
+  } catch {
+    // Not in provider, fall through
+  }
+
+  // Otherwise, fall back to direct loading (standalone pages)
   const [roster, setRoster] = React.useState<Player[]>([])
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
@@ -26,4 +39,3 @@ export function useRoster() {
 
   return { roster, setRoster, loading, error, refresh }
 }
-

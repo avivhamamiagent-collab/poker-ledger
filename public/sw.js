@@ -1,6 +1,6 @@
 /* Minimal offline cache + Web Push for Poker Ledger */
-const CACHE = 'poker-ledger-v2'
-const ASSETS = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg']
+const CACHE = 'poker-ledger-v4'
+const ASSETS = ['/manifest.webmanifest', '/icon.svg']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()))
@@ -20,19 +20,32 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(req.url)
   if (url.origin !== self.location.origin) return
 
+  // Never stale-cache app navigations; always prefer network for HTML so fresh deploys load.
+  if (req.mode === 'navigate' || req.destination === 'document') {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(req, { cache: 'no-store' })
+        return fresh
+      } catch {
+        const cached = await caches.match('/index.html')
+        return cached || caches.match('/') || Response.error()
+      }
+    })())
+    return
+  }
+
   event.respondWith(
     caches.match(req).then((cached) => {
       if (cached) return cached
       return fetch(req)
         .then((resp) => {
-          // Cache GET only
-          if (req.method === 'GET' && resp.ok) {
+          if (req.method === 'GET' && resp.ok && req.destination !== 'script' && req.destination !== 'style') {
             const copy = resp.clone()
             caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {})
           }
           return resp
         })
-        .catch(() => cached || caches.match('/'))
+        .catch(() => cached || Response.error()),
     }),
   )
 })

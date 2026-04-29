@@ -5,6 +5,19 @@ body {
   height: 100%;
 }
 
+html {
+  direction: rtl;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at top, rgba(100, 210, 255, 0.12), transparent 28%),
+    #070b12;
+  color: #e7eefc;
+}
+
 #root {
   min-height: 100%;
 }
@@ -19,3 +32,21 @@ button {
   font: inherit;
 }
 
+@keyframes chip-spin {
+  from { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.04); }
+  to { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes loading-bar {
+  0% { transform: translateX(-70%); }
+  100% { transform: translateX(170%); }
+}
+
+.chip-spin {
+  animation: chip-spin 1.8s linear infinite;
+}
+
+.loading-bar {
+  animation: loading-bar 1.3s ease-in-out infinite;
+}

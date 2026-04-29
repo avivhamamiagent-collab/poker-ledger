@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { ToastsProvider } from '../components/ui/use-toast'
@@ -6,60 +7,75 @@ import { StoreProvider } from './store-context'
 import { AuthProvider } from './auth/auth-context'
 import { RequireAuth } from './auth/RequireAuth'
 import { AppShell } from './shell/AppShell'
-import { LoginPage } from './pages/LoginPage'
-import { SessionsPage } from './pages/SessionsPage'
-import { RosterPage } from './pages/RosterPage'
-import { GroupsPage } from './pages/groups/GroupsPage'
-import { GroupPage } from './pages/groups/GroupPage'
-import { GamePage } from './pages/groups/GamePage'
-import { NotificationsPage } from './pages/NotificationsPage'
-import { SessionLayout } from './pages/session/SessionLayout'
-import { SessionParticipantsPage } from './pages/session/SessionParticipantsPage'
-import { SessionEntriesPage } from './pages/session/SessionEntriesPage'
-import { SessionCashoutsPage } from './pages/session/SessionCashoutsPage'
-import { SessionSettlementPage } from './pages/session/SessionSettlementPage'
-import { SessionExportPage } from './pages/session/SessionExportPage'
-import { SessionAuditPage } from './pages/session/SessionAuditPage'
+import { SessionErrorBoundary } from './pages/SessionErrorBoundary'
+
+const LoginPage = React.lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })))
+const SessionsPage = React.lazy(() => import('./pages/SessionsPage').then((m) => ({ default: m.SessionsPage })))
+const RosterPage = React.lazy(() => import('./pages/RosterPage').then((m) => ({ default: m.RosterPage })))
+const GroupsPage = React.lazy(() => import('./pages/groups/GroupsPage').then((m) => ({ default: m.GroupsPage })))
+const GroupPage = React.lazy(() => import('./pages/groups/GroupPage').then((m) => ({ default: m.GroupPage })))
+const GamePage = React.lazy(() => import('./pages/groups/GamePage').then((m) => ({ default: m.GamePage })))
+const NotificationsPage = React.lazy(() => import('./pages/NotificationsPage').then((m) => ({ default: m.NotificationsPage })))
+const SessionLayout = React.lazy(() => import('./pages/session/SessionLayout').then((m) => ({ default: m.SessionLayout })))
+const SessionParticipantsPage = React.lazy(() =>
+  import('./pages/session/SessionParticipantsPage').then((m) => ({ default: m.SessionParticipantsPage }))
+)
+const SessionEntriesPage = React.lazy(() =>
+  import('./pages/session/SessionEntriesPage').then((m) => ({ default: m.SessionEntriesPage }))
+)
+const SessionCashoutsPage = React.lazy(() =>
+  import('./pages/session/SessionCashoutsPage').then((m) => ({ default: m.SessionCashoutsPage }))
+)
+const SessionSettlementPage = React.lazy(() =>
+  import('./pages/session/SessionSettlementPage').then((m) => ({ default: m.SessionSettlementPage }))
+)
+const SessionExportPage = React.lazy(() =>
+  import('./pages/session/SessionExportPage').then((m) => ({ default: m.SessionExportPage }))
+)
+const OnboardingPage = React.lazy(() => import('./pages/OnboardingPage').then((m) => ({ default: m.OnboardingPage })))
+const SessionAuditPage = React.lazy(() => import('./pages/session/SessionAuditPage').then((m) => ({ default: m.SessionAuditPage })))
 
 export function App() {
   return (
     <AuthProvider>
       <StoreProvider>
         <ToastsProvider>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
+          <React.Suspense fallback={<div className="container py-6 text-sm text-zinc-500">טוען…</div>}>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
 
-            <Route
-              element={
-                <RequireAuth>
-                  <AppShell />
-                </RequireAuth>
-              }
-            >
-              <Route path="/" element={<SessionsPage />} />
-              <Route path="/roster" element={<RosterPage />} />
-              <Route path="/groups" element={<GroupsPage />} />
-              <Route path="/group/:id" element={<GroupPage />} />
-              <Route path="/game/:id" element={<GamePage />} />
-              <Route path="/notifications" element={<NotificationsPage />} />
+              <Route
+                element={
+                  <RequireAuth>
+                    <AppShell />
+                  </RequireAuth>
+                }
+>
+                <Route path="/" element={<SessionsPage />} />
+                <Route path="/onboarding" element={<OnboardingPage />} />
+                <Route path="/roster" element={<RosterPage />} />
+                <Route path="/groups" element={<GroupsPage />} />
+                <Route path="/group/:id" element={<GroupPage />} />
+                <Route path="/game/:id" element={<GamePage />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
 
-              <Route path="/session/:id" element={<SessionLayout />}>
-                <Route index element={<Navigate to="participants" replace />} />
-                <Route path="participants" element={<SessionParticipantsPage />} />
-                <Route path="entries" element={<SessionEntriesPage />} />
-                <Route path="cashout" element={<SessionCashoutsPage />} />
-                <Route path="settlement" element={<SessionSettlementPage />} />
-                <Route path="export" element={<SessionExportPage />} />
-                <Route path="audit" element={<SessionAuditPage />} />
+                <Route path="/session/:id" element={<SessionErrorBoundary><SessionLayout /></SessionErrorBoundary>}>
+                  <Route index element={<Navigate to="participants" replace />} />
+                  <Route path="participants" element={<SessionParticipantsPage />} />
+                  <Route path="entries" element={<SessionEntriesPage />} />
+                  <Route path="cashout" element={<SessionCashoutsPage />} />
+                  <Route path="settlement" element={<SessionSettlementPage />} />
+                  <Route path="export" element={<SessionExportPage />} />
+                  <Route path="audit" element={<SessionAuditPage />} />
+                </Route>
+
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Route>
-
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Route>
-          </Routes>
+            </Routes>
+          </React.Suspense>
           <Toaster />
         </ToastsProvider>
       </StoreProvider>
     </AuthProvider>
   )
 }
-

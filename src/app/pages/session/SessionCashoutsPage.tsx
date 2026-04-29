@@ -6,16 +6,21 @@ import { useRoster } from '../../hooks/useRoster'
 import { useSession } from '../../hooks/useSession'
 import { ils } from '../../../lib/money'
 import { cn } from '../../../lib/utils'
+import { OnboardingBanner } from '../../onboarding/OnboardingBanner'
+import { useNavigate } from 'react-router-dom'
+import { useOnboarding } from '../../onboarding/useOnboarding'
 
 export function SessionCashoutsPage() {
   const { roster } = useRoster()
   const { session, loading, error, persist } = useSession()
+  const nav = useNavigate()
+  const ob = useOnboarding(session)
 
   if (loading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Loading…</CardTitle>
+          <CardTitle>טוען…</CardTitle>
         </CardHeader>
       </Card>
     )
@@ -24,7 +29,7 @@ export function SessionCashoutsPage() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Couldn’t load cashouts</CardTitle>
+          <CardTitle>לא הצלחנו לטעון יציאות</CardTitle>
           {error && <CardDescription>{error}</CardDescription>}
         </CardHeader>
       </Card>
@@ -33,15 +38,33 @@ export function SessionCashoutsPage() {
 
   const participants = participantsForSession(session, roster)
 
+  const hasCashouts = Object.values(session.cashouts || {}).some((v) => v > 0)
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Cashouts</CardTitle>
-        <CardDescription>Net = cashout − total buy-ins.</CardDescription>
+        <CardTitle>יציאות</CardTitle>
+        <CardDescription>נטו = יציאה − סה״כ כניסות.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
+        {ob.obActive && ob.state.activeSessionId === session.id && !ob.state.done ? (
+          <OnboardingBanner
+            stepLabel="התחלה מהירה • שלב 3/4"
+            title="רושמים יציאות"
+            body="כמה כל אחד יצא בסוף הערב. אחרי זה עוברים לסגירה."
+            primaryLabel="המשך לסגירה"
+            primaryDisabled={!hasCashouts}
+            onPrimary={() => {
+              ob.setStep('settlement')
+              nav(`/session/${session.id}/settlement?ob=1`)
+            }}
+            secondaryLabel="דלג"
+            onSecondary={() => ob.complete()}
+          />
+        ) : null}
+
         {participants.length === 0 ? (
-          <div className="text-sm text-zinc-500 dark:text-zinc-400">Select participants first.</div>
+          <div className="text-sm text-zinc-500 dark:text-zinc-400">קודם בוחרים משתתפים.</div>
         ) : (
           <div className="grid gap-3">
             {participants.map((p) => {
@@ -53,7 +76,7 @@ export function SessionCashoutsPage() {
                     <div className="min-w-0">
                       <div className="truncate font-semibold">{p.name}</div>
                       <div className={cn('text-xs', net >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-700 dark:text-red-300')}>
-                        Net: {ils(net)}
+                        נטו: {ils(net)}
                       </div>
                     </div>
                     <div className={cn('text-sm font-semibold', net >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-700 dark:text-red-300')}>
@@ -62,7 +85,7 @@ export function SessionCashoutsPage() {
                   </div>
 
                   <div className="mt-3">
-                    <div className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-300">Cashout</div>
+                    <div className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-300">יציאה</div>
                     <Input
                       inputMode="numeric"
                       value={cashout || ''}

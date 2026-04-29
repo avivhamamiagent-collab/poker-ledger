@@ -31,10 +31,10 @@ export function LoginPage() {
         options: { emailRedirectTo: redirectTo },
       })
       if (error) throw error
-      toast.push({ title: 'Check your email', description: 'We sent you a magic link to sign in.' })
+      toast.push({ title: 'בדקו את האימייל', description: 'נשלח קישור כניסה חד־פעמי.' })
       setEmail('')
     } catch (err: any) {
-      toast.push({ title: 'Sign in failed', description: String(err?.message ?? err) })
+      toast.push({ title: 'הכניסה נכשלה', description: String(err?.message ?? err) })
     } finally {
       setLoading(false)
     }
@@ -42,10 +42,10 @@ export function LoginPage() {
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-4 pt-8">
-      <Card>
+      <Card className="border-white/10 bg-white/5 text-zinc-50 shadow-2xl shadow-cyan-950/20">
         <CardHeader>
-          <CardTitle>Sign in</CardTitle>
-          <CardDescription>Magic link email sign-in (no password).</CardDescription>
+          <CardTitle className="text-2xl">Poker Ledger</CardTitle>
+          <CardDescription className="text-zinc-300">ניהול שולחן פוקר בעברית, בלי אקסל ובלי כאב ראש.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={sendMagicLink} className="flex flex-col gap-3">
@@ -53,17 +53,17 @@ export function LoginPage() {
               type="email"
               inputMode="email"
               autoComplete="email"
-              placeholder="you@company.com"
+              placeholder="האימייל שלך"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
             <Button type="submit" disabled={loading}>
-              {loading ? 'Sending…' : 'Send magic link'}
+              {loading ? 'שולח…' : 'שליחת קישור כניסה'}
             </Button>
           </form>
           <p className="mt-3 text-xs text-zinc-500">
-            If you open the link on mobile, it will bring you back to this app.
+            פותחים את הקישור במובייל וחוזרים ישר לאפליקציה.
           </p>
         </CardContent>
       </Card>
