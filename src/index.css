@@ -47,6 +47,66 @@ button {
   animation: chip-spin 1.8s linear infinite;
 }
 
+.chip-spin-slow {
+  animation: chip-spin 3s linear infinite;
+}
+
 .loading-bar {
   animation: loading-bar 1.3s ease-in-out infinite;
 }
+
+/* Poker chip */
+.poker-chip {
+  border-radius: 50%;
+  border: 3px dashed rgba(212,175,55,0.6);
+  background: radial-gradient(circle at 35% 35%, #d4af37 0%, #1a472a 50%, #0d2818 100%);
+  box-shadow: 0 4px 20px rgba(212,175,55,0.3), inset 0 0 12px rgba(0,0,0,0.5);
+}
+
+.chip-stack-1 { transform: translate(-50%,-50%) translateY(16px) rotate(-8deg); opacity: 0.7; }
+.chip-stack-2 { transform: translate(-50%,-50%) translateY(6px) rotate(4deg); opacity: 0.85; }
+.chip-stack-3 { transform: translate(-50%,-50%) translateY(-4px) rotate(-2deg); }
+
+/* Floating cards */
+@keyframes card-float {
+  0%, 100% { transform: translateY(0px) rotate(var(--rot, 12deg)); }
+  50% { transform: translateY(-12px) rotate(calc(var(--rot, 12deg) + 3deg)); }
+}
+.card-float {
+  --rot: 12deg;
+  animation: card-float 4s ease-in-out infinite;
+}
+.card-float-delayed {
+  --rot: -6deg;
+  animation: card-float 4s ease-in-out 1s infinite;
+}
+
+/* Felt surface */
+.felt-surface {
+  background:
+    radial-gradient(circle at 50% 30%, rgba(0,255,136,0.06), transparent 50%),
+    radial-gradient(circle at top, rgba(100,210,255,0.1), transparent 25%),
+    #070b12;
+}
+
+/* Brand glow */
+.brand-glow {
+  background: linear-gradient(135deg, #d4af37 0%, #f5e6a3 40%, #d4af37 60%, #00ff88 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  filter: drop-shadow(0 0 20px rgba(212,175,55,0.4));
+}
+
+/* Fade in */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+.fade-in-delay-1 { animation-delay: 0.15s; opacity: 0; }
+.fade-in-delay-2 { animation-delay: 0.3s; opacity: 0; }
+.fade-in-delay-3 { animation-delay: 0.45s; opacity: 0; }

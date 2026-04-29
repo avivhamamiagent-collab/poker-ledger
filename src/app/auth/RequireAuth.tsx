@@ -1,7 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom'
 
 import { useAuth } from './auth-context'
-import { SplashScreen } from '../components/SplashScreen'
+import { SplashScreen } from '../../components/SplashScreen'
 
 export function RequireAuth({ children }: { children: React.ReactNode }) {
   const { enabled, user, loading, error } = useAuth()
