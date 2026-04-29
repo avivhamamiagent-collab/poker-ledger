@@ -62,7 +62,7 @@ export function SessionEntriesPage() {
           <span className="text-label-caps font-label-caps text-on-primary-container mb-2 relative z-10">קופה כוללת</span>
           <div className="text-display-currency font-display-currency text-tertiary relative z-10 flex items-baseline gap-1" dir="ltr">
             <span>₪</span>
-            <span>{pot.toLocaleString('he-IL')}</span>
+            <span key={pot} className="motion-safe:animate-numberPop">{pot.toLocaleString('he-IL')}</span>
           </div>
         </div>
       </section>
@@ -125,7 +125,7 @@ export function SessionEntriesPage() {
                           (isWinning ? 'text-primary' : isLosing ? 'text-error' : 'text-on-surface')
                         }
                       >
-                        {ils(net)}
+                        <span key={net} className="motion-safe:animate-numberPop">{ils(net)}</span>
                       </span>
                     </div>
                   </div>
@@ -134,7 +134,7 @@ export function SessionEntriesPage() {
                     <div className="bg-surface-container-highest/50 rounded-lg border border-outline-variant/20 p-3">
                       <div className="text-label-caps font-label-caps text-on-surface-variant mb-1">כניסה ראשונית</div>
                       <input
-                        className="w-full bg-transparent outline-none text-data-tabular font-data-tabular text-on-surface"
+                        className="w-full bg-transparent outline-none text-data-tabular font-data-tabular text-on-surface focus-visible:ring-2 focus-visible:ring-tertiary/40 rounded-md"
                         inputMode="numeric"
                         value={buyin || ''}
                         placeholder="0"
@@ -147,14 +147,14 @@ export function SessionEntriesPage() {
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          className="w-10 h-10 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center"
+                          className="w-10 h-10 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                           onClick={() => persist(addRebuyUnits(session, p.id, -1, p.name))}
                           disabled={units <= 0}
                         >
                           <Minus className="h-4 w-4" />
                         </button>
                         <input
-                          className="flex-1 bg-transparent outline-none text-data-tabular font-data-tabular text-on-surface text-center"
+                          className="flex-1 bg-transparent outline-none text-data-tabular font-data-tabular text-on-surface text-center focus-visible:ring-2 focus-visible:ring-tertiary/40 rounded-md"
                           inputMode="numeric"
                           value={units || ''}
                           placeholder="0"
@@ -162,7 +162,7 @@ export function SessionEntriesPage() {
                         />
                         <button
                           type="button"
-                          className="w-10 h-10 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center"
+                          className="w-10 h-10 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                           onClick={() => persist(addRebuyUnits(session, p.id, 1, p.name))}
                         >
                           <Plus className="h-4 w-4" />
@@ -174,14 +174,14 @@ export function SessionEntriesPage() {
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      className="flex-1 bg-surface-container-highest hover:bg-surface-variant transition-colors py-2 rounded-lg border border-outline-variant flex items-center justify-center gap-2 font-body-sm text-body-sm text-on-surface"
+                      className="flex-1 bg-surface-container-highest hover:bg-surface-variant transition-all duration-200 active:scale-[0.98] py-2 rounded-lg border border-outline-variant flex items-center justify-center gap-2 font-body-sm text-body-sm text-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       onClick={() => persist(addRebuyUnits(session, p.id, 1, p.name))}
                     >
                       +{ils(REBUY_UNIT_ILS)}
                     </button>
                     <button
                       type="button"
-                      className="flex-1 bg-surface-container-highest hover:bg-surface-variant transition-colors py-2 rounded-lg border border-outline-variant flex items-center justify-center gap-2 font-body-sm text-body-sm text-on-surface"
+                      className="flex-1 bg-surface-container-highest hover:bg-surface-variant transition-all duration-200 active:scale-[0.98] py-2 rounded-lg border border-outline-variant flex items-center justify-center gap-2 font-body-sm text-body-sm text-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                       onClick={() => persist(addRebuyUnits(session, p.id, 2, p.name))}
                     >
                       +{ils(REBUY_UNIT_ILS * 2)}
@@ -195,10 +195,10 @@ export function SessionEntriesPage() {
       </section>
 
       {/* Floating Action Button */}
-      <div className="fixed bottom-[100px] left-1/2 -translate-x-1/2 z-40 w-full max-w-[300px] px-4">
+      <div className="fixed bottom-[100px] left-1/2 -translate-x-1/2 z-40 w-full max-w-[300px] px-4 motion-safe:animate-slideUp">
         <button
           type="button"
-          className="w-full h-touch-target bg-[#2D6A4F] text-white rounded-full flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(0,0,0,0.5)] border border-[#D4AF37]/30 hover:bg-[#1B4332] active:scale-95 transition-all"
+          className="w-full h-touch-target bg-[#2D6A4F] text-white rounded-full flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(0,0,0,0.5)] border border-[#D4AF37]/30 hover:bg-[#1B4332] active:scale-[0.98] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           onClick={() => nav(`/session/${session.id}/cashout`)}
         >
           <span className="material-symbols-outlined">arrow_back</span>

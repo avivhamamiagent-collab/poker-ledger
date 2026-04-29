@@ -46,6 +46,86 @@ button {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes chipBounce {
+  0% {
+    transform: translateY(0) scale(1);
+  }
+  35% {
+    transform: translateY(-10px) scale(1.02);
+  }
+  70% {
+    transform: translateY(0) scale(0.99);
+  }
+  100% {
+    transform: translateY(-2px) scale(1);
+  }
+}
+
+@keyframes cardSlideIn {
+  0% {
+    transform: translateX(24px) rotate(2deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes numberPop {
+  0% {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes goldPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px rgba(233, 195, 73, 0.18), 0 12px 25px rgba(233, 195, 73, 0.08);
+  }
+  50% {
+    box-shadow: 0 0 0 1px rgba(233, 195, 73, 0.32), 0 16px 35px rgba(233, 195, 73, 0.14);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 /* Ambient glow helper */
 .casino-ambient-glow {
   position: fixed;

@@ -20,7 +20,7 @@ export function AppShell() {
         <button
           type="button"
           onClick={() => nav('/profile')}
-          className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-[rgba(212,175,55,0.3)] shrink-0"
+          className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-[rgba(212,175,55,0.3)] shrink-0 transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           aria-label="פרופיל"
         >
           <span className="material-symbols-outlined text-on-surface-variant text-[20px]">person</span>
@@ -32,7 +32,7 @@ export function AppShell() {
 
         <Link
           to="/groups"
-          className="text-emerald-500 dark:text-emerald-400 hover:bg-[#1B4332] transition-colors scale-95 active:opacity-80 p-2 rounded-full flex items-center justify-center"
+          className="text-emerald-500 dark:text-emerald-400 hover:bg-[#1B4332] transition-all duration-200 scale-95 active:scale-[0.98] active:opacity-80 p-2 rounded-full flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           aria-label="קבוצות"
         >
           <span className="material-symbols-outlined">groups</span>
@@ -90,8 +90,8 @@ function BottomNavButton({
       type="button"
       onClick={onClick}
       className={cn(
-        'flex flex-col items-center justify-center transition-all w-16',
-        active ? 'text-[#D4AF37] scale-110' : 'text-slate-400 opacity-60 hover:text-emerald-300 active:-translate-y-0.5 duration-300',
+        'flex flex-col items-center justify-center transition-all duration-200 w-16 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl',
+        active ? 'text-[#D4AF37] scale-110 motion-safe:animate-goldPulse' : 'text-slate-400 opacity-60 hover:text-emerald-300 active:-translate-y-0.5 duration-300',
       )}
     >
       <span

@@ -46,12 +46,12 @@ export function GroupsPage() {
     <div className="bg-surface text-on-surface font-body-sm pb-[100px]">
       <main className="mt-[0px] flex flex-col gap-section-margin">
         {/* Search Bar */}
-        <div className="relative">
+        <div className="relative motion-safe:animate-fadeIn">
           <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
             search
           </span>
           <input
-            className="w-full bg-surface-container h-touch-target rounded-full pl-4 pr-10 border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-body-lg font-body-lg text-on-surface placeholder-on-surface-variant transition-colors outline-none"
+            className="w-full bg-surface-container h-touch-target rounded-full pl-4 pr-10 border border-outline-variant focus:border-tertiary focus:ring-2 focus:ring-tertiary/40 text-body-lg font-body-lg text-on-surface placeholder-on-surface-variant transition-all duration-200 outline-none"
             placeholder="חיפוש קבוצות..."
             type="text"
             value={q}
@@ -88,14 +88,14 @@ export function GroupsPage() {
                     </span>
                     <div className="flex gap-2">
                       <button
-                        className="bg-surface-container-highest hover:bg-surface-variant transition-colors py-1.5 px-3 rounded-lg border border-outline-variant flex items-center justify-center gap-2 font-body-sm text-body-sm text-on-surface"
+                        className="bg-surface-container-highest hover:bg-surface-variant transition-all duration-200 active:scale-[0.98] py-1.5 px-3 rounded-lg border border-outline-variant flex items-center justify-center gap-2 font-body-sm text-body-sm text-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         type="button"
                         onClick={() => respond(inv.id, 'declined')}
                       >
                         דחייה
                       </button>
                       <button
-                        className="bg-[#2D6A4F] hover:bg-[#1B4332] transition-colors py-1.5 px-3 rounded-lg border border-[rgba(212,175,55,0.3)] flex items-center justify-center gap-2 font-body-sm text-body-sm text-white font-medium"
+                        className="bg-[#2D6A4F] hover:bg-[#1B4332] transition-all duration-200 active:scale-[0.98] py-1.5 px-3 rounded-lg border border-[rgba(212,175,55,0.3)] flex items-center justify-center gap-2 font-body-sm text-body-sm text-white font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         type="button"
                         onClick={() => respond(inv.id, 'accepted')}
                       >
@@ -118,21 +118,23 @@ export function GroupsPage() {
                 <Link
                   key={g.id}
                   to={`/group/${g.id}`}
-                  className="bg-primary-container border border-[rgba(212,175,55,0.15)] rounded-xl p-4 flex items-center justify-between shadow-[0px_4px_20px_rgba(0,0,0,0.5)]"
+                  className="relative rounded-xl p-[1px] bg-gradient-to-l from-[#D4AF37]/35 via-[#D4AF37]/10 to-[#D4AF37]/35 motion-safe:animate-cardSlideIn transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-surface-variant rounded-full flex items-center justify-center border border-[rgba(212,175,55,0.3)]">
-                      <span className="material-symbols-outlined text-primary">casino</span>
+                  <div className="bg-primary-container/90 backdrop-blur-sm hover:backdrop-blur-md rounded-xl p-4 flex items-center justify-between shadow-[0px_4px_20px_rgba(0,0,0,0.5)] transition-all duration-200">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-surface-variant rounded-full flex items-center justify-center border border-[rgba(212,175,55,0.3)] transition-all duration-200">
+                        <span className="material-symbols-outlined text-primary">casino</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-data-tabular font-data-tabular text-on-surface">{g.name}</span>
+                        <span className="text-body-sm font-body-sm text-on-surface-variant">
+                          עודכן {new Date(g.updatedAt).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex flex-col">
-                      <span className="text-data-tabular font-data-tabular text-on-surface">{g.name}</span>
-                      <span className="text-body-sm font-body-sm text-on-surface-variant">
-                        עודכן {new Date(g.updatedAt).toLocaleDateString()}
-                      </span>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="text-body-sm font-body-sm text-on-surface-variant">הקשה לפתיחה</span>
                     </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="text-body-sm font-body-sm text-on-surface-variant">הקשה לפתיחה</span>
                   </div>
                 </Link>
               ))}
@@ -143,7 +145,7 @@ export function GroupsPage() {
 
       {/* FAB */}
       <button
-        className="fixed bottom-[100px] left-6 w-14 h-14 bg-[#2D6A4F] text-white rounded-full flex items-center justify-center shadow-[0px_4px_20px_rgba(0,0,0,0.5)] z-40 hover:bg-[#1B4332] transition-colors border border-[rgba(212,175,55,0.3)]"
+        className="fixed bottom-[100px] left-6 w-14 h-14 bg-[#2D6A4F] text-white rounded-full flex items-center justify-center shadow-[0px_4px_20px_rgba(0,0,0,0.5)] z-40 hover:bg-[#1B4332] transition-all duration-200 active:scale-[0.98] border border-[rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         type="button"
         onClick={() => nav('/groups/new')}
         aria-label="יצירת קבוצה"

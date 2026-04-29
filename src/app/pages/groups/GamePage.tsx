@@ -87,7 +87,7 @@ export function GamePage() {
           <CardTitle>Your RSVP</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-2">
+          <div className="flex gap-2 motion-safe:animate-slideUp">
             <Button variant={myRsvp === 'going' ? 'default' : 'secondary'} onClick={() => setRsvp('going')}>
               Going
             </Button>

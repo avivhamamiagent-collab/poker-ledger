@@ -15,7 +15,7 @@ export function SplashScreen() {
         <div className="w-48 h-48 relative drop-shadow-[0_0_30px_rgba(212,175,55,0.2)]">
           <img
             alt="Premium 3D poker chip"
-            className="w-full h-full object-contain filter contrast-125 saturate-110"
+            className="w-full h-full object-contain filter contrast-125 saturate-110 motion-safe:animate-chipBounce"
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbN1ykKctBxFMY1v7wNFVeSKE1kapfumlHipL8Xyo_YKsHudvj9BEFmyqwfZhsPxO31i3gXjwWFYoackT5emKibqM8fB0t0K7HVg2roZyfcI6WPtwiYEaUHEZHwn22HzE0sYAPXzQUjfy8-0UzO7v1CaGxiV9i_FvsLOJ1GLdYIx6DKWDVofD1yx1_X_441HIWi1DNywyKiRrsFK8-F0-xDLdEo9Urq-VvlTLhRwkd2iK8ECeYuNpwNfsLraSvVf6b8B2K2LHcFZ0"
           />
         </div>
@@ -25,8 +25,12 @@ export function SplashScreen() {
           <p className="font-headline-md text-headline-md text-tertiary">נכנסים למועדון...</p>
           {/* Sleek Loading Bar */}
           <div className="w-64 h-1.5 bg-surface-container-highest rounded-full overflow-hidden border border-outline-variant/30">
-            <div className="h-full bg-gradient-to-l from-tertiary via-primary to-primary-container w-2/3 rounded-full relative">
+            <div className="h-full bg-gradient-to-l from-tertiary via-primary to-primary-container w-2/3 rounded-full relative overflow-hidden">
               <div className="absolute inset-0 bg-white/20 w-full h-full" />
+              <div
+                aria-hidden
+                className="absolute inset-0 opacity-40 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,.55),transparent)] bg-[length:200%_100%] motion-safe:animate-shimmer"
+              />
             </div>
           </div>
         </div>

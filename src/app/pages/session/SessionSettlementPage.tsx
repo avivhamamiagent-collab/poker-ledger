@@ -59,7 +59,8 @@ export function SessionSettlementPage() {
 
       <main className="flex flex-col gap-section-margin">
         {/* Summary Card */}
-        <section className="bg-primary-container rounded-xl border border-[rgba(212,175,55,0.15)] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+        <section className="rounded-xl p-[1px] bg-gradient-to-l from-[#D4AF37]/35 via-[#D4AF37]/10 to-[#D4AF37]/35">
+          <div className="bg-primary-container/90 backdrop-blur-sm rounded-xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
           <h2 className="font-label-caps text-label-caps text-on-surface-variant mb-4 uppercase text-center">סיכום קופה</h2>
           <div className="flex justify-between items-center mb-6">
             <div className="text-center">
@@ -83,6 +84,7 @@ export function SessionSettlementPage() {
               <span className="font-body-sm text-body-sm">{balanced ? `הקופה מאוזנת (הפרש ${ils(d)})` : `הפרש: ${ils(d)}`}</span>
             </div>
           </div>
+          </div>
         </section>
 
         {/* Required Transfers */}
@@ -99,7 +101,7 @@ export function SessionSettlementPage() {
               {transfers.map((t) => (
                 <div
                   key={`${t.fromPlayerId}-${t.toPlayerId}-${t.amount}`}
-                  className="bg-surface-container rounded-lg border border-outline-variant p-4 flex flex-col gap-4 relative overflow-hidden"
+                  className="bg-surface-container/90 backdrop-blur-sm rounded-lg border border-outline-variant/40 p-4 flex flex-col gap-4 relative overflow-hidden motion-safe:animate-cardSlideIn transition-all duration-200"
                 >
                   <div className="absolute right-0 top-0 bottom-0 w-1 bg-tertiary" />
                   <div className="flex justify-between items-center">
@@ -126,7 +128,7 @@ export function SessionSettlementPage() {
                     <button
                       type="button"
                       onClick={() => copyTransfer(t)}
-                      className="flex-1 bg-surface-container-highest hover:bg-surface-variant transition-colors py-2 rounded-lg border border-outline-variant flex items-center justify-center gap-2 font-body-sm text-body-sm text-on-surface"
+                      className="flex-1 bg-surface-container-highest hover:bg-surface-variant transition-all duration-200 active:scale-[0.98] py-2 rounded-lg border border-outline-variant flex items-center justify-center gap-2 font-body-sm text-body-sm text-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       <span className="material-symbols-outlined text-sm">content_copy</span>
                       העתק בקשה
@@ -134,7 +136,7 @@ export function SessionSettlementPage() {
                     <button
                       type="button"
                       onClick={() => copyTransfer(t)}
-                      className="flex-1 bg-[#10B1B0] hover:opacity-90 transition-opacity py-2 rounded-lg flex items-center justify-center gap-2 font-body-sm text-body-sm text-white font-medium"
+                      className="flex-1 bg-[#10B1B0] hover:opacity-90 transition-all duration-200 active:scale-[0.98] py-2 rounded-lg flex items-center justify-center gap-2 font-body-sm text-body-sm text-white font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       שלם ב-Bit
                     </button>
@@ -149,7 +151,7 @@ export function SessionSettlementPage() {
         <div className="mt-4 pb-8">
           <button
             type="button"
-            className="w-full bg-[#2D6A4F] text-white py-4 rounded-xl font-headline-md text-headline-md flex justify-center items-center gap-2 hover:bg-[#1B4332] transition-colors shadow-[0_4px_20px_rgba(0,0,0,0.5)] border border-[rgba(212,175,55,0.3)]"
+            className="w-full bg-[#2D6A4F] text-white py-4 rounded-xl font-headline-md text-headline-md flex justify-center items-center gap-2 hover:bg-[#1B4332] transition-all duration-200 active:scale-[0.98] shadow-[0_4px_20px_rgba(0,0,0,0.5)] border border-[rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-safe:animate-slideUp"
             onClick={() => nav(`/session/${session.id}/export`)}
           >
             <span className="material-symbols-outlined">share</span>
