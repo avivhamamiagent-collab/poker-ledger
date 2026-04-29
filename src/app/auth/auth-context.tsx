@@ -20,7 +20,6 @@ const STORAGE_KEY = 'poker_ledger_user'
 const USERS_KEY = 'poker_ledger_users'
 
 function hashPassword(password: string): string {
-  // Simple hash for local storage (not crypto-grade, but sufficient for local app)
   let hash = 0
   for (let i = 0; i < password.length; i++) {
     const char = password.charCodeAt(i)
@@ -58,6 +57,9 @@ function setCurrentUser(user: LocalUser | null) {
   }
 }
 
+// Global setter so signUp/signIn can update React state
+let _setAuthState: React.Dispatch<React.SetStateAction<AuthState>> | null = null
+
 export function signUp(email: string, password: string, displayName: string): LocalUser {
   const users = getStoredUsers()
   const key = email.toLowerCase().trim()
@@ -76,6 +78,12 @@ export function signUp(email: string, password: string, displayName: string): Lo
   users[key] = { passwordHash: hashPassword(password), user }
   saveStoredUsers(users)
   setCurrentUser(user)
+
+  // Update React state
+  if (_setAuthState) {
+    _setAuthState({ enabled: true, user, loading: false })
+  }
+
   return user
 }
 
@@ -93,11 +101,20 @@ export function signIn(email: string, password: string): LocalUser {
   }
 
   setCurrentUser(entry.user)
+
+  // Update React state
+  if (_setAuthState) {
+    _setAuthState({ enabled: true, user: entry.user, loading: false })
+  }
+
   return entry.user
 }
 
 export function signOut() {
   setCurrentUser(null)
+  if (_setAuthState) {
+    _setAuthState({ enabled: true, user: null, loading: false })
+  }
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -108,9 +125,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   })
 
   React.useEffect(() => {
-    // Check for existing session
+    _setAuthState = setState
     const existing = getCurrentUser()
     setState({ enabled: true, user: existing, loading: false })
+    return () => { _setAuthState = null }
   }, [])
 
   return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>
