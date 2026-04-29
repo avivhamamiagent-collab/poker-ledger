@@ -1,65 +1,117 @@
 import * as React from 'react'
-import type { User } from '@supabase/supabase-js'
 
-import { getEnv } from '../../config/env'
-import { supabase } from '../../data/supabase/client'
+export type LocalUser = {
+  id: string
+  email: string
+  displayName: string
+  createdAt: string
+}
 
 type AuthState = {
   enabled: boolean
-  user: User | null
+  user: LocalUser | null
   loading: boolean
   error?: string
 }
 
 const AuthContext = React.createContext<AuthState | null>(null)
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const env = getEnv()
-  const hasSupabaseConfig = Boolean(env.supabaseUrl && env.supabaseAnonKey)
-  const enabled = env.storage === 'supabase' && env.enableSupabaseAuth && hasSupabaseConfig
+const STORAGE_KEY = 'poker_ledger_user'
+const USERS_KEY = 'poker_ledger_users'
 
-  const [state, setState] = React.useState<AuthState>({ enabled, user: null, loading: enabled })
+function hashPassword(password: string): string {
+  // Simple hash for local storage (not crypto-grade, but sufficient for local app)
+  let hash = 0
+  for (let i = 0; i < password.length; i++) {
+    const char = password.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash |= 0
+  }
+  return 'h_' + Math.abs(hash).toString(36) + '_' + password.length
+}
+
+function getStoredUsers(): Record<string, { passwordHash: string; user: LocalUser }> {
+  try {
+    return JSON.parse(localStorage.getItem(USERS_KEY) || '{}')
+  } catch {
+    return {}
+  }
+}
+
+function saveStoredUsers(users: Record<string, { passwordHash: string; user: LocalUser }>) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users))
+}
+
+function getCurrentUser(): LocalUser | null {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null')
+  } catch {
+    return null
+  }
+}
+
+function setCurrentUser(user: LocalUser | null) {
+  if (user) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(user))
+  } else {
+    localStorage.removeItem(STORAGE_KEY)
+  }
+}
+
+export function signUp(email: string, password: string, displayName: string): LocalUser {
+  const users = getStoredUsers()
+  const key = email.toLowerCase().trim()
+
+  if (users[key]) {
+    throw new Error('כתובת האימייל כבר רשומה. נסה להתחבר.')
+  }
+
+  const user: LocalUser = {
+    id: 'local_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8),
+    email: key,
+    displayName: displayName || key.split('@')[0],
+    createdAt: new Date().toISOString(),
+  }
+
+  users[key] = { passwordHash: hashPassword(password), user }
+  saveStoredUsers(users)
+  setCurrentUser(user)
+  return user
+}
+
+export function signIn(email: string, password: string): LocalUser {
+  const users = getStoredUsers()
+  const key = email.toLowerCase().trim()
+  const entry = users[key]
+
+  if (!entry) {
+    throw new Error('אימייל לא נמצא. נסה להירשם.')
+  }
+
+  if (entry.passwordHash !== hashPassword(password)) {
+    throw new Error('סיסמה שגויה.')
+  }
+
+  setCurrentUser(entry.user)
+  return entry.user
+}
+
+export function signOut() {
+  setCurrentUser(null)
+}
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [state, setState] = React.useState<AuthState>({
+    enabled: true,
+    user: null,
+    loading: true,
+  })
 
   React.useEffect(() => {
-    if (!enabled) {
-      setState({ enabled, user: null, loading: false })
-      return
-    }
-
-    let sb
-    try {
-      sb = supabase()
-    } catch (e: any) {
-      setState({ enabled: false, user: null, loading: false, error: String(e?.message ?? e) })
-      return
-    }
-
-    let cancelled = false
-
-    sb.auth
-      .getSession()
-      .then(({ data, error }) => {
-        if (cancelled) return
-        if (error) {
-          setState({ enabled, user: null, loading: false, error: error.message })
-          return
-        }
-        setState({ enabled, user: data.session?.user ?? null, loading: false })
-      })
-      .catch((e: any) => {
-        if (cancelled) return
-        setState({ enabled, user: null, loading: false, error: String(e?.message ?? e) })
-      })
-
-    const { data: sub } = sb.auth.onAuthStateChange((_event, session) => {
-      setState((prev) => ({ ...prev, user: session?.user ?? null }))
-    })
-
-    return () => {
-      cancelled = true
-      sub.subscription.unsubscribe()
-    }
-  }, [enabled])
+    // Check for existing session
+    const existing = getCurrentUser()
+    setState({ enabled: true, user: existing, loading: false })
+  }, [])
 
   return <AuthContext.Provider value={state}>{children}</AuthContext.Provider>
 }

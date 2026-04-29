@@ -6,11 +6,10 @@ import { Button } from '../../components/ui/button'
 import { Card, CardContent } from '../../components/ui/card'
 import { Input } from '../../components/ui/input'
 import { useToast } from '../../components/ui/use-toast'
-import { supabase } from '../../data/supabase/client'
-import { useAuth } from '../auth/auth-context'
+import { useAuth, signUp, signIn } from '../auth/auth-context'
 
 export function LoginPage() {
-  const { user, enabled } = useAuth()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const toast = useToast()
 
@@ -21,32 +20,20 @@ export function LoginPage() {
   const [loading, setLoading] = React.useState(false)
 
   React.useEffect(() => {
-    if (enabled && user) navigate('/', { replace: true })
-  }, [enabled, user, navigate])
+    if (user) navigate('/', { replace: true })
+  }, [user, navigate])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!enabled) {
-      navigate('/', { replace: true })
-      return
-    }
     setLoading(true)
     try {
-      const sb = supabase()
       if (isSignUp) {
-        const { error } = await sb.auth.signUp({
-          email,
-          password,
-          options: {
-            data: { display_name: displayName },
-          },
-        })
-        if (error) throw error
-        toast.push({ title: 'נרשמת בהצלחה', description: 'אפשר להתחיל לשחק!' })
+        signUp(email, password, displayName)
+        toast.push({ title: 'נרשמת בהצלחה! 🎉', description: 'ברוכים הבאים לפנקס פוקר.' })
       } else {
-        const { error } = await sb.auth.signInWithPassword({ email, password })
-        if (error) throw error
+        signIn(email, password)
       }
+      navigate('/', { replace: true })
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
       toast.push({ title: isSignUp ? 'ההרשמה נכשלה' : 'הכניסה נכשלה', description: msg })
@@ -108,89 +95,87 @@ export function LoginPage() {
                 <div className="space-y-2 text-right">
                   <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs text-emerald-100">
                     <ListChecks className="h-3.5 w-3.5" />
-                    {enabled ? 'כניסה לחשבון' : 'מצב מקומי פעיל'}
+                    {isSignUp ? 'הרשמה חדשה' : 'כניסה לחשבון'}
                   </div>
                   <h2 className="text-2xl font-semibold tracking-tight text-zinc-50">
-                    {enabled ? 'שליחת קישור כניסה' : 'להתחיל לעבוד'}
+                    {isSignUp ? 'צור חשבון' : 'שמחים לראות אותך'}
                   </h2>
                   <p className="text-sm leading-6 text-zinc-300">
-                    {enabled
-                      ? 'קבלו קישור חד־פעמי לאימייל וחזרו ישר לשולחן.'
-                      : 'הנתונים נשמרים על המכשיר הזה. אפשר לפתוח שולחן מיד ולהתחיל לרשום.'}
+                    {isSignUp
+                      ? 'הרשמה מהירה — בלי אימייל, בלי טלפון, רק שם וסיסמה.'
+                      : 'הכנס אימייל וסיסמה וקדימה לשחק.'}
                   </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-3">
-                  {enabled ? (
-                    <>
-                      {isSignUp && (
-                        <>
-                          <label className="block text-right text-sm font-medium text-zinc-200" htmlFor="displayName">
-                            שם תצוגה
-                          </label>
-                          <Input
-                            id="displayName"
-                            type="text"
-                            autoComplete="name"
-                            placeholder="אביב"
-                            value={displayName}
-                            onChange={(e) => setDisplayName(e.target.value)}
-                            required
-                            className="h-12 border-white/10 bg-white/5 text-base text-zinc-50 placeholder:text-zinc-500 focus-visible:ring-emerald-300"
-                          />
-                        </>
-                      )}
-                      <label className="block text-right text-sm font-medium text-zinc-200" htmlFor="email">
-                        אימייל
+                  {isSignUp && (
+                    <div className="space-y-1.5">
+                      <label className="block text-right text-sm font-medium text-zinc-200" htmlFor="displayName">
+                        שם תצוגה
                       </label>
                       <Input
-                        id="email"
-                        type="email"
-                        inputMode="email"
-                        autoComplete="email"
-                        placeholder="name@email.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        id="displayName"
+                        type="text"
+                        autoComplete="name"
+                        placeholder="אביב"
+                        value={displayName}
+                        onChange={(e) => setDisplayName(e.target.value)}
                         required
                         className="h-12 border-white/10 bg-white/5 text-base text-zinc-50 placeholder:text-zinc-500 focus-visible:ring-emerald-300"
                       />
-                      <label className="block text-right text-sm font-medium text-zinc-200" htmlFor="password">
-                        סיסמה
-                      </label>
-                      <Input
-                        id="password"
-                        type="password"
-                        autoComplete={isSignUp ? 'new-password' : 'current-password'}
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        minLength={6}
-                        className="h-12 border-white/10 bg-white/5 text-base text-zinc-50 placeholder:text-zinc-500 focus-visible:ring-emerald-300"
-                      />
-                    </>
-                  ) : null}
+                    </div>
+                  )}
+                  <div className="space-y-1.5">
+                    <label className="block text-right text-sm font-medium text-zinc-200" htmlFor="email">
+                      אימייל
+                    </label>
+                    <Input
+                      id="email"
+                      type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      placeholder="name@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="h-12 border-white/10 bg-white/5 text-base text-zinc-50 placeholder:text-zinc-500 focus-visible:ring-emerald-300"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="block text-right text-sm font-medium text-zinc-200" htmlFor="password">
+                      סיסמה
+                    </label>
+                    <Input
+                      id="password"
+                      type="password"
+                      autoComplete={isSignUp ? 'new-password' : 'current-password'}
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={6}
+                      className="h-12 border-white/10 bg-white/5 text-base text-zinc-50 placeholder:text-zinc-500 focus-visible:ring-emerald-300"
+                    />
+                  </div>
                   <Button
                     type="submit"
                     disabled={loading}
                     className="relative h-12 w-full overflow-hidden rounded-xl border border-amber-300/20 bg-[linear-gradient(180deg,#d4af37,#a97f11)] text-base font-semibold text-[#1a1200] shadow-[0_18px_60px_rgba(212,175,55,0.28)] hover:bg-[linear-gradient(180deg,#e3bf4e,#b88c17)]"
                   >
-                    {loading ? 'רגע…' : enabled ? (isSignUp ? 'הרשמה' : 'כניסה') : 'כניסה לאפליקציה'}
-                    {!enabled ? <ArrowLeft className="relative z-10 h-4 w-4" /> : null}
+                    {loading ? 'רגע…' : isSignUp ? 'הרשמה' : 'כניסה'}
+                    {!isSignUp && <ArrowLeft className="relative z-10 h-4 w-4" />}
                     <span
                       aria-hidden
                       className="absolute inset-0 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.45),transparent)] bg-[length:200%_100%] opacity-35 motion-safe:animate-shimmer"
                     />
                   </Button>
-                  {enabled && (
-                    <button
-                      type="button"
-                      onClick={() => setIsSignUp(!isSignUp)}
-                      className="w-full text-center text-sm text-zinc-400 hover:text-zinc-200"
-                    >
-                      {isSignUp ? 'כבר יש חשבון? כניסה' : 'אין חשבון? הרשמה'}
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => setIsSignUp(!isSignUp)}
+                    className="w-full text-center text-sm text-zinc-400 hover:text-zinc-200"
+                  >
+                    {isSignUp ? 'כבר יש חשבון? כניסה' : 'אין חשבון? הרשמה'}
+                  </button>
                 </form>
 
                 <div className="rounded-2xl border border-white/8 bg-white/5 p-4">
