@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { CalendarClock, ChevronLeft, Mail, Plus, UsersRound } from 'lucide-react'
 
+import { Button } from '../../../components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card'
 import { useToast } from '../../../components/ui/use-toast'
 import type { GroupInvite } from '../../../domain/types'
 import { useGroups } from '../../hooks/useGroups'
@@ -46,129 +49,109 @@ export function GroupsPage() {
   const pendingInvites = invites.filter((i) => i.status === 'pending')
 
   return (
-    <div className="bg-surface text-on-surface font-body-sm pb-[100px]">
-      <main className="mt-[0px] flex flex-col gap-section-margin">
-        {/* Search Bar */}
-        <div className="relative motion-safe:animate-fadeIn">
-          <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
-            search
-          </span>
+    <div className="space-y-5 pb-10">
+      <section className="gold-bezel overflow-hidden rounded-2xl bg-surface-container-low/72 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.38)]">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-tertiary/20 bg-tertiary/10 px-3 py-1 text-xs font-semibold text-tertiary">
+              <UsersRound className="h-3.5 w-3.5" />
+              תיאום משחקים
+            </div>
+            <h1 className="text-2xl font-black tracking-tight text-on-surface">הקבוצות שלי</h1>
+            <p className="mt-1 text-sm leading-6 text-on-surface-variant">ניהול חברים, הזמנות ומשחקים מתוכננים במסך אחד.</p>
+          </div>
+          <Button onClick={() => nav('/groups/new')}>
+            <Plus className="h-4 w-4" />
+            קבוצה חדשה
+          </Button>
+        </div>
+      </section>
+
+      <Card>
+        <CardContent className="p-4">
           <input
-            className="w-full bg-surface-container h-touch-target rounded-full pl-4 pr-10 border border-outline-variant focus:border-tertiary focus:ring-2 focus:ring-tertiary/40 text-body-lg font-body-lg text-on-surface placeholder-on-surface-variant transition-all duration-200 outline-none"
+            className="h-11 w-full rounded-xl border border-tertiary/18 bg-surface-container-high/80 px-4 text-sm text-on-surface placeholder:text-on-surface-variant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/40"
             placeholder="חיפוש קבוצות..."
             type="text"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Content Area */}
-        <section className="flex flex-col gap-stack-gap">
-          <h2 className="text-headline-md font-headline-md text-on-surface">הקבוצות שלי</h2>
+      {error ? <div className="rounded-xl border border-red-400/20 bg-red-500/10 p-3 text-sm text-red-200">{error}</div> : null}
 
-          {error ? <div className="text-body-sm font-body-sm text-error">{error}</div> : null}
-
-          {invLoading ? null : pendingInvites.length ? (
-            <div className="flex flex-col gap-stack-gap">
-              {pendingInvites.map((inv) => (
-                <div
-                  key={inv.id}
-                  className="bg-primary-container border border-tertiary-container/50 rounded-xl p-4 flex items-center justify-between relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-tertiary-container/5 to-transparent pointer-events-none" />
-                  <div className="flex items-center gap-4 relative z-10">
-                    <div className="w-12 h-12 bg-surface-variant rounded-full flex items-center justify-center border border-tertiary-container/50">
-                      <span className="material-symbols-outlined text-tertiary-container">mail</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-data-tabular font-data-tabular text-on-surface">הזמנה לקבוצה</span>
-                      <span className="text-body-sm font-body-sm text-on-surface-variant">{inv.email}</span>
-                    </div>
+      {!invLoading && pendingInvites.length ? (
+        <div className="grid gap-3">
+          {pendingInvites.map((inv) => (
+            <Card key={inv.id}>
+              <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-tertiary/12 text-tertiary">
+                    <Mail className="h-4 w-4" />
                   </div>
-                  <div className="flex flex-col items-end gap-2 relative z-10">
-                    <span className="bg-[#1B4332] text-tertiary-container border border-tertiary-container/30 px-2 py-1 rounded text-label-caps font-label-caps">
-                      הזמנה חדשה
-                    </span>
-                    <div className="flex gap-2">
-                      <button
-                        className="bg-surface-container-highest hover:bg-surface-variant transition-all duration-200 active:scale-[0.98] py-1.5 px-3 rounded-lg border border-outline-variant flex items-center justify-center gap-2 font-body-sm text-body-sm text-on-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                        type="button"
-                        onClick={() => respond(inv.id, 'declined')}
-                      >
-                        דחייה
-                      </button>
-                      <button
-                        className="bg-[#2D6A4F] hover:bg-[#1B4332] transition-all duration-200 active:scale-[0.98] py-1.5 px-3 rounded-lg border border-[rgba(212,175,55,0.3)] flex items-center justify-center gap-2 font-body-sm text-body-sm text-white font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                        type="button"
-                        onClick={() => respond(inv.id, 'accepted')}
-                      >
-                        אישור
-                      </button>
-                    </div>
+                  <div>
+                    <div className="text-sm font-semibold text-on-surface">הזמנה לקבוצה</div>
+                    <div className="text-xs text-on-surface-variant">{inv.email}</div>
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : null}
+                <div className="flex gap-2">
+                  <Button variant="secondary" type="button" onClick={() => respond(inv.id, 'declined')}>
+                    דחייה
+                  </Button>
+                  <Button type="button" onClick={() => respond(inv.id, 'accepted')}>
+                    אישור
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : null}
 
-          {loading ? (
-            <div className="rounded-xl border border-tertiary/14 bg-surface-container/70 p-4 text-body-sm font-body-sm text-on-surface-variant">טוען…</div>
-          ) : filtered.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-tertiary/22 bg-surface-container/70 p-5 text-center shadow-[0_14px_40px_rgba(0,0,0,0.24)]">
-              <div className="chip-face mx-auto mb-4 h-16 w-16 rounded-full" />
-              <h3 className="text-lg font-black text-on-surface">אין עדיין קבוצות</h3>
-              <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-on-surface-variant">
-                קבוצה היא המקום לתכנן משחקים, לשלוח הזמנות ולפתוח לדג׳ר משותף לערב.
-              </p>
-              <button
-                type="button"
-                onClick={() => nav('/groups/new')}
-                className="mt-4 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-tertiary/25 bg-[linear-gradient(180deg,#e9c349,#b88c17)] px-4 py-2 text-sm font-semibold text-on-tertiary shadow-[0_12px_30px_rgba(233,195,73,0.16)] active:scale-[0.98]"
-              >
-                <span className="material-symbols-outlined text-sm">add</span>
-                צור קבוצה ראשונה
-              </button>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-stack-gap">
-              {filtered.map((g) => (
-                <Link
-                  key={g.id}
-                  to={`/group/${g.id}`}
-                  className="relative rounded-xl p-[1px] bg-gradient-to-l from-[#D4AF37]/35 via-[#D4AF37]/10 to-[#D4AF37]/35 motion-safe:animate-cardSlideIn transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                >
-                  <div className="bg-primary-container/90 backdrop-blur-sm hover:backdrop-blur-md rounded-xl p-4 flex items-center justify-between shadow-[0px_4px_20px_rgba(0,0,0,0.5)] transition-all duration-200">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-surface-variant rounded-full flex items-center justify-center border border-[rgba(212,175,55,0.3)] transition-all duration-200">
-                        <span className="material-symbols-outlined text-primary">casino</span>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-data-tabular font-data-tabular text-on-surface">{g.name}</span>
-                        <span className="text-body-sm font-body-sm text-on-surface-variant">
-                          עודכן {new Date(g.updatedAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <span className="text-body-sm font-body-sm text-on-surface-variant">הקשה לפתיחה</span>
+      {loading ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>טוען קבוצות…</CardTitle>
+            <CardDescription>אוסף את רשימת הקבוצות שלך.</CardDescription>
+          </CardHeader>
+        </Card>
+      ) : filtered.length === 0 ? (
+        <Card className="text-center">
+          <CardHeader className="items-center">
+            <div className="chip-face mb-2 h-16 w-16 rounded-full" />
+            <CardTitle>אין עדיין קבוצות</CardTitle>
+            <CardDescription>קבוצה עוזרת לתאם משחק ולפתוח שולחן משותף בלחיצה אחת.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => nav('/groups/new')}>
+              <Plus className="h-4 w-4" />
+              יצירת קבוצה ראשונה
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-3">
+          {filtered.map((g) => (
+            <Link key={g.id} to={`/group/${g.id}`}>
+              <Card className="hover:border-tertiary/30">
+                <CardContent className="flex items-center justify-between gap-3 p-4">
+                  <div className="min-w-0">
+                    <div className="truncate text-base font-semibold text-on-surface">{g.name}</div>
+                    <div className="mt-1 text-xs text-on-surface-variant">
+                      עודכן {new Date(g.updatedAt).toLocaleDateString('he-IL')}
                     </div>
                   </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </section>
-      </main>
-
-      {/* FAB */}
-      <button
-        className="fixed bottom-[100px] left-6 w-14 h-14 bg-[#2D6A4F] text-white rounded-full flex items-center justify-center shadow-[0px_4px_20px_rgba(0,0,0,0.5)] z-40 hover:bg-[#1B4332] transition-all duration-200 active:scale-[0.98] border border-[rgba(212,175,55,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-        type="button"
-        onClick={() => nav('/groups/new')}
-        aria-label="יצירת קבוצה"
-      >
-        <span className="material-symbols-outlined text-[28px]">add</span>
-      </button>
+                  <div className="flex items-center gap-2 text-on-surface-variant">
+                    <CalendarClock className="h-4 w-4" />
+                    <ChevronLeft className="h-4 w-4" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

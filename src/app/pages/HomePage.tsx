@@ -7,15 +7,22 @@ import { Card, CardContent } from '../../components/ui/card'
 import { useStore } from '../store-context'
 import { useSessions } from '../hooks/useSessions'
 import { ils } from '../../lib/money'
+import { useToast } from '../../components/ui/use-toast'
 
 export function HomePage() {
   const store = useStore()
   const { sessions, loading } = useSessions()
   const nav = useNavigate()
+  const toast = useToast()
   async function onCreate() {
-    const s = createSession()
-    await store.putSession(s)
-    nav(`/session/${s.id}/entries`)
+    try {
+      const s = createSession()
+      await store.putSession(s)
+      nav(`/session/${s.id}/entries`)
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'יצירת שולחן נכשלה'
+      toast.push({ title: 'לא הצלחנו לפתוח שולחן', description: msg })
+    }
   }
 
   // Stats
@@ -41,7 +48,7 @@ export function HomePage() {
             <span className="chip-face h-4 w-4 rounded-full" aria-hidden />
             פנקס פוקר
           </div>
-          <h1 className="text-2xl font-black tracking-tight text-on-surface">שלום, שחקן 🃏</h1>
+          <h1 className="text-2xl font-black tracking-tight text-on-surface">ניהול ערבי פוקר</h1>
           <p className="mt-1 text-sm leading-6 text-on-surface-variant">
             מוכן למשחק? פתח שולחן חדש או המשך משחק פתוח.
           </p>

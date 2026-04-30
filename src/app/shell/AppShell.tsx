@@ -54,6 +54,7 @@ export function AppShell() {
 
       <nav className="fixed right-5 top-24 z-40 hidden w-16 flex-col items-center gap-3 rounded-2xl border border-tertiary/15 bg-[#071b13]/82 p-2 shadow-[0_20px_60px_rgba(0,0,0,0.38)] backdrop-blur-xl md:flex">
         <SideNavButton active={path === '/' || path.startsWith('/session/')} onClick={() => nav('/')} label="בית" icon="home" />
+        <SideNavButton active={path.startsWith('/sessions')} onClick={() => nav('/sessions')} label="היסטוריה" icon="history" />
         <SideNavButton
           active={path.startsWith('/groups') || path.startsWith('/group') || path.startsWith('/game')}
           onClick={() => nav('/groups')}
@@ -61,12 +62,6 @@ export function AppShell() {
           icon="groups"
         />
         <SideNavButton active={path.startsWith('/roster')} onClick={() => nav('/roster')} label="שחקנים" icon="group_add" />
-        <SideNavButton
-          active={path.startsWith('/notifications')}
-          onClick={() => nav('/notifications')}
-          label="התראות"
-          icon="notifications"
-        />
         <SideNavButton
           active={path.startsWith('/profile') || path.startsWith('/settings')}
           onClick={() => nav('/profile')}
@@ -91,12 +86,6 @@ export function AppShell() {
           icon="groups"
         />
         <BottomNavButton active={path.startsWith('/roster')} onClick={() => nav('/roster')} label="שחקנים" icon="group_add" />
-        <BottomNavButton
-          active={path.startsWith('/notifications')}
-          onClick={() => nav('/notifications')}
-          label="התראות"
-          icon="notifications"
-        />
         <BottomNavButton
           active={path.startsWith('/profile') || path.startsWith('/settings')}
           onClick={() => nav('/profile')}
@@ -166,7 +155,7 @@ function BottomNavButton({
       >
         {icon}
       </span>
-      <span className="text-[10px] font-medium font-inter">{label}</span>
+      <span className="text-[10px] font-medium">{label}</span>
     </button>
   )
 }

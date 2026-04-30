@@ -9,7 +9,7 @@ import { useToast } from '../../components/ui/use-toast'
 import { signIn, signUp, useAuth } from '../auth/auth-context'
 
 export function LoginPage() {
-  const { user } = useAuth()
+  const { user, enabled } = useAuth()
   const navigate = useNavigate()
   const toast = useToast()
 
@@ -25,11 +25,15 @@ export function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (!enabled) {
+      navigate('/', { replace: true })
+      return
+    }
     setLoading(true)
     try {
       if (isSignUp) {
         await signUp(email, password, displayName)
-        toast.push({ title: 'נרשמת בהצלחה! 🎉', description: 'ברוכים הבאים לפנקס פוקר.' })
+        toast.push({ title: 'נרשמת בהצלחה', description: 'ברוכים הבאים לפנקס פוקר.' })
       } else {
         await signIn(email, password)
       }
@@ -95,20 +99,22 @@ export function LoginPage() {
                 <div className="space-y-2 text-right">
                   <div className="inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs text-emerald-100">
                     <ListChecks className="h-3.5 w-3.5" />
-                    {isSignUp ? 'הרשמה חדשה' : 'כניסה לחשבון'}
+                    {enabled ? (isSignUp ? 'הרשמה חדשה' : 'כניסה לחשבון') : 'מצב מקומי פעיל'}
                   </div>
                   <h2 className="text-2xl font-semibold tracking-tight text-zinc-50">
-                    {isSignUp ? 'צור חשבון' : 'שמחים לראות אותך'}
+                    {enabled ? (isSignUp ? 'צור חשבון' : 'שמחים לראות אותך') : 'כניסה מהירה'}
                   </h2>
                   <p className="text-sm leading-6 text-zinc-300">
-                    {isSignUp
-                      ? 'הרשמה מהירה עם אימייל וסיסמה. אחרי זה נשארים מחוברים.'
-                      : 'הכנס אימייל וסיסמה וקדימה לשחק.'}
+                    {enabled
+                      ? (isSignUp
+                        ? 'הרשמה מהירה עם אימייל וסיסמה. אחרי זה נשארים מחוברים.'
+                        : 'הכנס אימייל וסיסמה וקדימה לשחק.')
+                      : 'האפליקציה מוגדרת לשמירה מקומית. אין צורך בחשבון כדי להתחיל לעבוד.'}
                   </p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-3">
-                  {isSignUp && (
+                  {enabled && isSignUp && (
                     <div className="space-y-1.5">
                       <label className="block text-right text-sm font-medium text-zinc-200" htmlFor="displayName">
                         שם תצוגה
@@ -125,6 +131,7 @@ export function LoginPage() {
                       />
                     </div>
                   )}
+                  {enabled ? (
                   <div className="space-y-1.5">
                     <label className="block text-right text-sm font-medium text-zinc-200" htmlFor="email">
                       אימייל
@@ -141,6 +148,8 @@ export function LoginPage() {
                       className="h-12 border-white/10 bg-white/5 text-base text-zinc-50 placeholder:text-zinc-500 focus-visible:ring-emerald-300"
                     />
                   </div>
+                  ) : null}
+                  {enabled ? (
                   <div className="space-y-1.5">
                     <label className="block text-right text-sm font-medium text-zinc-200" htmlFor="password">
                       סיסמה
@@ -157,25 +166,28 @@ export function LoginPage() {
                       className="h-12 border-white/10 bg-white/5 text-base text-zinc-50 placeholder:text-zinc-500 focus-visible:ring-emerald-300"
                     />
                   </div>
+                  ) : null}
                   <Button
                     type="submit"
                     disabled={loading}
                     className="relative h-12 w-full overflow-hidden rounded-xl border border-amber-300/20 bg-[linear-gradient(180deg,#d4af37,#a97f11)] text-base font-semibold text-[#1a1200] shadow-[0_18px_60px_rgba(212,175,55,0.28)] hover:bg-[linear-gradient(180deg,#e3bf4e,#b88c17)]"
                   >
-                    {loading ? 'רגע…' : isSignUp ? 'הרשמה' : 'כניסה'}
-                    {!isSignUp && <ArrowLeft className="relative z-10 h-4 w-4" />}
+                    {loading ? 'רגע…' : enabled ? (isSignUp ? 'הרשמה' : 'כניסה') : 'כניסה לאפליקציה'}
+                    <ArrowLeft className="relative z-10 h-4 w-4" />
                     <span
                       aria-hidden
                       className="absolute inset-0 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.45),transparent)] bg-[length:200%_100%] opacity-35 motion-safe:animate-shimmer"
                     />
                   </Button>
-                  <button
-                    type="button"
-                    onClick={() => setIsSignUp(!isSignUp)}
-                    className="w-full text-center text-sm text-zinc-400 hover:text-zinc-200"
-                  >
-                    {isSignUp ? 'כבר יש חשבון? כניסה' : 'אין חשבון? הרשמה'}
-                  </button>
+                  {enabled ? (
+                    <button
+                      type="button"
+                      onClick={() => setIsSignUp(!isSignUp)}
+                      className="w-full text-center text-sm text-zinc-400 hover:text-zinc-200"
+                    >
+                      {isSignUp ? 'כבר יש חשבון? כניסה' : 'אין חשבון? הרשמה'}
+                    </button>
+                  ) : null}
                 </form>
 
                 <div className="rounded-2xl border border-white/8 bg-white/5 p-4">

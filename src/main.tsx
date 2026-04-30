@@ -1,5 +1,43 @@
 import './index.css'
 
+const APP_BUILD = '2026-04-30-ui-refresh-1'
+const BUILD_KEY = 'poker-ledger.app-build'
+const LEGACY_LOCAL_PREFIX = 'poker-ledger.local.'
+const LEGACY_ONBOARDING_KEY = 'poker-ledger.onboarding.v1'
+
+async function clearLegacyAppDataOnce() {
+  try {
+    const prev = window.localStorage.getItem(BUILD_KEY)
+    if (prev === APP_BUILD) return
+
+    // Update marker first to avoid reload loops if cleanup partially fails.
+    window.localStorage.setItem(BUILD_KEY, APP_BUILD)
+
+    // Remove legacy localStorage keys that can keep stale UX/data states.
+    const toRemove: string[] = []
+    for (let i = 0; i < window.localStorage.length; i += 1) {
+      const key = window.localStorage.key(i)
+      if (!key) continue
+      if (key.startsWith(LEGACY_LOCAL_PREFIX) || key === LEGACY_ONBOARDING_KEY) {
+        toRemove.push(key)
+      }
+    }
+    toRemove.forEach((key) => window.localStorage.removeItem(key))
+
+    // Clear IndexedDB app DB once between incompatible builds.
+    if ('indexedDB' in window) {
+      await new Promise<void>((resolve) => {
+        const req = window.indexedDB.deleteDatabase('poker-ledger')
+        req.onsuccess = () => resolve()
+        req.onerror = () => resolve()
+        req.onblocked = () => resolve()
+      })
+    }
+  } catch {
+    // ignore
+  }
+}
+
 async function clearStaleBrowserState() {
   try {
     if ('serviceWorker' in navigator) {
@@ -20,7 +58,7 @@ async function clearStaleBrowserState() {
   }
 }
 
-void clearStaleBrowserState()
+void Promise.all([clearLegacyAppDataOnce(), clearStaleBrowserState()])
 
 const rootEl = document.getElementById('root')
 if (rootEl && !rootEl.hasChildNodes()) {

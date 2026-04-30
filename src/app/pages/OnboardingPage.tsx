@@ -5,17 +5,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { createSession } from '../../domain/session'
 import { useStore } from '../store-context'
 import { useOnboarding } from '../onboarding/useOnboarding'
+import { useToast } from '../../components/ui/use-toast'
 
 export function OnboardingPage() {
   const store = useStore()
   const nav = useNavigate()
   const ob = useOnboarding()
+  const toast = useToast()
 
   async function onStart() {
-    const s = createSession(undefined)
-    await store.putSession(s)
-    ob.start(s.id)
-    nav(`/session/${s.id}/participants?ob=1`)
+    try {
+      const s = createSession(undefined)
+      await store.putSession(s)
+      ob.start(s.id)
+      nav(`/session/${s.id}/participants?ob=1`)
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'יצירת שולחן נכשלה'
+      toast.push({ title: 'לא הצלחנו לפתוח שולחן', description: msg })
+    }
   }
 
   return (

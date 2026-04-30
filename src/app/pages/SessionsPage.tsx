@@ -29,9 +29,14 @@ export function SessionsPage() {
   }
 
   async function onCreate() {
-    const s = createSession()
-    await persist(s)
-    nav(`/session/${s.id}`)
+    try {
+      const s = createSession()
+      await persist(s)
+      nav(`/session/${s.id}/entries`)
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'יצירת שולחן נכשלה'
+      toast.push({ title: 'לא הצלחנו לפתוח שולחן', description: msg })
+    }
   }
 
   async function onDelete(s: Session) {
