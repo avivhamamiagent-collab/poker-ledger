@@ -18,10 +18,10 @@ function playerName(roster: Player[], playerId: string) {
 
 function buildSummary(s: Session, roster: Player[], transfers: { fromPlayerId: string; toPlayerId: string; amount: number }[]): string {
   const lines: string[] = []
-  lines.push(`Poker night — ${s.dateISO}`)
-  lines.push(s.title)
+  lines.push(`סיכום ערב פוקר — ${s.dateISO}`)
+  lines.push(s.title || 'ערב פוקר')
   lines.push('')
-  lines.push('Players:')
+  lines.push('שחקנים:')
   for (const pid of s.participantIds) {
     const name = playerName(roster, pid)
     const buyin = s.buyins[pid] || 0
@@ -30,19 +30,19 @@ function buildSummary(s: Session, roster: Player[], transfers: { fromPlayerId: s
     const total = totalBuyinForPlayer(s, pid)
     const net = cashout - total
     lines.push(
-      `- ${name}: buy-in ${ils(buyin)}, rebuys ${units}×${ils(REBUY_UNIT_ILS)} (= ${ils(units * REBUY_UNIT_ILS)}), total ${ils(
+      `- ${name}: כניסה ${ils(buyin)}, ריבאיים ${units}×${ils(REBUY_UNIT_ILS)} (= ${ils(units * REBUY_UNIT_ILS)}), סה"כ ${ils(
         total,
-      )}, cashout ${ils(cashout)}, net ${ils(net)}`,
+      )}, קאשאאוט ${ils(cashout)}, נטו ${ils(net)}`,
     )
   }
   lines.push('')
-  lines.push(`Total buy-ins: ${ils(totalBuyins(s))}`)
-  lines.push(`Total cashouts: ${ils(totalCashouts(s))}`)
-  lines.push(`Delta: ${ils(delta(s))}`)
+  lines.push(`סה"כ כניסות: ${ils(totalBuyins(s))}`)
+  lines.push(`סה"כ קאשאאוט: ${ils(totalCashouts(s))}`)
+  lines.push(`הפרש: ${ils(delta(s))}`)
   lines.push('')
-  lines.push('Settlement:')
+  lines.push('העברות:')
   if (transfers.length === 0) {
-    lines.push('- No transfers')
+    lines.push('- אין העברות')
   } else {
     for (const t of transfers) {
       lines.push(`- ${playerName(roster, t.fromPlayerId)} → ${playerName(roster, t.toPlayerId)}: ${ils(t.amount)}`)
@@ -71,7 +71,7 @@ export function SessionExportPage() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Loading…</CardTitle>
+          <CardTitle>טוען…</CardTitle>
         </CardHeader>
       </Card>
     )
@@ -80,7 +80,7 @@ export function SessionExportPage() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Couldn’t load export</CardTitle>
+          <CardTitle>לא הצלחנו לטעון ייצוא</CardTitle>
           {error && <CardDescription>{error}</CardDescription>}
         </CardHeader>
       </Card>
@@ -90,18 +90,18 @@ export function SessionExportPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Share / Export</CardTitle>
-        <CardDescription>Copy the summary to WhatsApp/Telegram, or use native share.</CardDescription>
+        <CardTitle>שיתוף סיכום</CardTitle>
+        <CardDescription>אפשר להעתיק לוואטסאפ/טלגרם או לשתף ישירות מהמכשיר.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={async () => {
               await copyText(text)
-              toast.push({ title: 'Copied', description: 'Summary copied to clipboard.' })
+              toast.push({ title: 'הועתק', description: 'סיכום הערב הועתק ללוח.' })
             }}
           >
-            Copy summary
+            העתק סיכום
           </Button>
           <Button
             variant="secondary"
@@ -112,16 +112,16 @@ export function SessionExportPage() {
                 await nav.share({ text })
               } else {
                 await copyText(text)
-                toast.push({ title: 'Copied', description: 'Native share not supported here.' })
+                toast.push({ title: 'הועתק', description: 'שיתוף ישיר לא נתמך במכשיר הזה.' })
               }
             }}
           >
-            Share…
+            שיתוף…
           </Button>
         </div>
 
         <textarea
-          className="min-h-[240px] w-full resize-y rounded-xl border border-zinc-200 bg-white p-3 text-sm dark:border-zinc-800 dark:bg-zinc-950"
+          className="min-h-[240px] w-full resize-y rounded-xl border border-tertiary/18 bg-surface-container-high/70 p-3 text-sm text-on-surface"
           readOnly
           value={text}
         />
@@ -129,4 +129,3 @@ export function SessionExportPage() {
     </Card>
   )
 }
-

@@ -1,119 +1,137 @@
 import { useNavigate } from 'react-router-dom'
+import { Bell, Database, LogOut, RefreshCw, ShieldCheck, Trash2 } from 'lucide-react'
 
+import { Button } from '../../components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { useToast } from '../../components/ui/use-toast'
 import { getEnv } from '../../config/env'
+import { signOut } from '../auth/auth-context'
+import { supabase } from '../../data/supabase/client'
 
 export function SettingsPage() {
   const nav = useNavigate()
   const toast = useToast()
   const env = getEnv()
 
+  async function checkConnection() {
+    try {
+      const sb = supabase()
+      const { error } = await sb.auth.getSession()
+      if (error) throw error
+      toast.push({ title: 'החיבור תקין', description: 'Supabase זמין ומחובר.' })
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      toast.push({ title: 'שגיאת חיבור', description: msg })
+    }
+  }
+
+  async function clearBrowserCache() {
+    const ok = window.confirm('לנקות cache מקומי של הדפדפן ולרענן את האפליקציה?')
+    if (!ok) return
+    try {
+      if ('caches' in window) {
+        const keys = await caches.keys()
+        await Promise.all(keys.map((key) => caches.delete(key)))
+      }
+      toast.push({ title: 'ה-cache נוקה', description: 'מרענן עכשיו את האפליקציה.' })
+      window.setTimeout(() => window.location.reload(), 350)
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      toast.push({ title: 'ניקוי cache נכשל', description: msg })
+    }
+  }
+
+  async function onSignOut() {
+    try {
+      await signOut()
+      nav('/login', { replace: true })
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      toast.push({ title: 'יציאה נכשלה', description: msg })
+    }
+  }
+
   return (
-    <div className="text-on-background antialiased selection:bg-primary/20">
-      <main className="flex flex-col gap-section-margin">
-        <section className="gold-bezel overflow-hidden rounded-2xl bg-surface-container-low/78 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.34)]">
-          <div className="text-xs font-semibold text-tertiary">קונפיגורציה</div>
-          <h1 className="mt-1 font-headline-lg text-2xl font-black text-on-surface">הגדרות מערכת</h1>
-          <p className="mt-1 font-body-sm text-body-sm leading-6 text-on-surface-variant">ניהול העדפות, תצוגה ונתוני אפליקציה.</p>
-        </section>
+    <div className="space-y-5">
+      <section className="gold-bezel overflow-hidden rounded-2xl bg-surface-container-low/78 p-5 shadow-[0_22px_70px_rgba(0,0,0,0.34)]">
+        <div className="text-xs font-semibold text-tertiary">קונפיגורציה ותפעול</div>
+        <h1 className="mt-1 text-2xl font-black text-on-surface">הגדרות מערכת</h1>
+        <p className="mt-1 text-sm leading-6 text-on-surface-variant">בדיקות חיבור, ניקוי cache, התראות ויציאה מחשבון.</p>
+      </section>
 
-        <section className="grid grid-cols-2 gap-stack-gap">
-          <div className="col-span-1 bg-surface-container/78 rounded-2xl p-4 border border-tertiary/14 shadow-[0_14px_40px_rgba(0,0,0,0.24)] flex flex-col justify-between min-h-[140px] relative overflow-hidden group hover:border-primary/30 transition-colors active:scale-[0.98]">
-            <div className="flex justify-between items-start mb-4">
-              <div className="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
-                <span className="material-symbols-outlined text-primary">language</span>
-              </div>
-              <span className="material-symbols-outlined text-on-surface-variant/50 text-sm">expand_more</span>
-            </div>
-            <div>
-              <h3 className="font-body-sm text-body-sm text-on-surface-variant mb-1">שפת ממשק</h3>
-              <p className="font-data-tabular text-data-tabular text-on-surface">עברית</p>
-            </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Database className="h-5 w-5 text-tertiary" />
+            מצב אחסון
+          </CardTitle>
+          <CardDescription>האפליקציה עובדת בענן בלבד דרך Supabase.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="rounded-xl border border-tertiary/16 bg-black/18 p-3 text-sm">
+            <div>Storage: <span className="font-semibold">supabase</span></div>
+            <div className="mt-1 text-on-surface-variant">ENV: {env.storage || 'supabase'}</div>
           </div>
+          <Button variant="secondary" onClick={checkConnection}>
+            <ShieldCheck className="h-4 w-4" />
+            בדיקת חיבור Supabase
+          </Button>
+        </CardContent>
+      </Card>
 
-          <div className="col-span-1 bg-surface-container/78 rounded-2xl p-4 border border-tertiary/14 shadow-[0_14px_40px_rgba(0,0,0,0.24)] flex flex-col justify-between min-h-[140px] relative overflow-hidden opacity-90">
-            <div className="flex justify-between items-start mb-4">
-              <div className="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
-                <span className="material-symbols-outlined text-tertiary">payments</span>
-              </div>
-              <span className="material-symbols-outlined text-on-surface-variant/50 text-sm">lock</span>
-            </div>
-            <div>
-              <h3 className="font-body-sm text-body-sm text-on-surface-variant mb-1">מטבע בסיס</h3>
-              <p className="font-data-tabular text-data-tabular text-tertiary">₪ (ILS)</p>
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-br from-tertiary/5 to-transparent pointer-events-none" />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>התראות</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => nav('/notifications')}>
+              <Bell className="h-4 w-4" />
+              מעבר להתראות
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>רענון לקוח</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button variant="secondary" onClick={clearBrowserCache}>
+              <RefreshCw className="h-4 w-4" />
+              ניקוי cache ורענון
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-red-100">אזור חשבון</CardTitle>
+          <CardDescription>ניתוק מהחשבון הנוכחי.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button variant="destructive" onClick={onSignOut}>
+            <LogOut className="h-4 w-4" />
+            יציאה מהחשבון
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-red-100">אזהרה</CardTitle>
+        </CardHeader>
+        <CardContent className="text-sm text-on-surface-variant">
+          מחיקת נתוני מערכת נשלטת דרך מסד הנתונים והרשאות Supabase בלבד.
+          <div className="mt-3">
+            <Button variant="secondary" onClick={() => toast.push({ title: 'נחסם במכוון', description: 'מחיקת נתוני ענן מתבצעת רק בכלי ניהול מאובטחים.' })}>
+              <Trash2 className="h-4 w-4" />
+              מחיקה מלאה (חסום)
+            </Button>
           </div>
-
-          <div className="col-span-2 bg-surface-container/78 rounded-2xl p-5 border border-tertiary/14 shadow-[0_14px_40px_rgba(0,0,0,0.24)] flex flex-col gap-4">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center">
-                <span className="material-symbols-outlined text-primary text-sm">cloud_sync</span>
-              </div>
-              <h3 className="font-body-lg text-body-lg text-on-surface">אחסון וסנכרון</h3>
-            </div>
-
-            <div className="flex bg-surface-container-highest p-1 rounded-xl w-full relative">
-              <div
-                className={
-                  'absolute left-1 top-1 bottom-1 w-[calc(50%-4px)] bg-primary-container rounded-lg shadow-sm transition-all duration-300 border border-primary/20 ' +
-                  (env.storage === 'supabase' ? 'translate-x-full' : 'translate-x-0')
-                }
-              />
-              <button
-                type="button"
-                onClick={() => toast.push({ title: 'מצב אחסון נקבע בקונפיג', description: `כעת: ${env.storage}` })}
-                className="relative z-10 flex-1 py-2 text-center font-body-sm text-body-sm text-on-primary-container font-medium"
-              >
-                ענן
-              </button>
-              <button
-                type="button"
-                onClick={() => toast.push({ title: 'מצב אחסון נקבע בקונפיג', description: `כעת: ${env.storage}` })}
-                className="relative z-10 flex-1 py-2 text-center font-body-sm text-body-sm text-on-surface-variant"
-              >
-                מקומי
-              </button>
-            </div>
-
-            <p className="font-body-sm text-body-sm text-on-surface-variant/70 text-xs mt-1">
-              כרגע מצב האחסון נקבע בזמן build/deploy. כדי לשנות — צריך לעדכן ENV.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => nav('/profile')}
-            className="col-span-2 bg-surface-container/78 rounded-2xl p-5 border border-tertiary/14 shadow-[0_14px_40px_rgba(0,0,0,0.24)] flex items-center justify-between active:scale-[0.98] transition-transform"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center">
-                <span className="material-symbols-outlined text-on-surface">help</span>
-              </div>
-              <div className="text-right">
-                <h3 className="font-body-lg text-body-lg text-on-surface">כל הפיצ׳רים</h3>
-                <p className="font-body-sm text-body-sm text-on-surface-variant">חזרה למרכז הקיצורים</p>
-              </div>
-            </div>
-            <span className="material-symbols-outlined text-on-surface-variant transform rotate-90">expand_less</span>
-          </button>
-
-          <div className="col-span-2 mt-4">
-            <h4 className="font-label-caps text-label-caps text-error mb-3 px-1 uppercase tracking-widest">אזור מסוכן</h4>
-            <button
-              type="button"
-              className="w-full bg-error-container/20 border border-error/30 rounded-2xl p-4 flex items-center justify-center gap-3 text-error opacity-70 cursor-not-allowed"
-              disabled
-            >
-              <span className="material-symbols-outlined">delete_forever</span>
-              <span className="font-headline-md text-headline-md text-base">מחיקת כל הנתונים</span>
-            </button>
-            <p className="text-center font-body-sm text-body-sm text-on-surface-variant/60 mt-3 px-4 text-xs">
-              כרגע פעולה זו מושבתת כדי למנוע מחיקה לא מכוונת.
-            </p>
-          </div>
-        </section>
-      </main>
+        </CardContent>
+      </Card>
     </div>
   )
 }

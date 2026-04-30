@@ -40,7 +40,7 @@ export async function signOut() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const env = getEnv()
   const hasSupabaseConfig = Boolean(env.supabaseUrl && env.supabaseAnonKey)
-  const enabled = env.storage === 'supabase' && hasSupabaseConfig
+  const enabled = hasSupabaseConfig
 
   const [state, setState] = React.useState<AuthState>({
     enabled,

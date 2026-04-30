@@ -40,6 +40,18 @@ export function SessionSettlementPage() {
     toast.push({ title: 'הועתק', description: text })
   }
 
+  async function payWithBit(t: { fromPlayerId: string; toPlayerId: string; amount: number }) {
+    const text = `בקשת תשלום: ${playerName(t.fromPlayerId)} מעביר/ה ל-${playerName(t.toPlayerId)} סכום ${ils(t.amount)}`
+    await copyText(text)
+
+    const target = 'https://www.bitpay.co.il/'
+    const win = window.open(target, '_blank', 'noopener,noreferrer')
+    if (!win) {
+      window.location.href = target
+    }
+    toast.push({ title: 'נפתחה אפליקציית Bit', description: 'נוסח הבקשה הועתק ללוח.' })
+  }
+
   return (
     <div className="bg-background text-on-background font-body-lg antialiased pb-24">
       {ob.obActive && ob.state.activeSessionId === session.id && !ob.state.done ? (
@@ -135,7 +147,7 @@ export function SessionSettlementPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => copyTransfer(t)}
+                      onClick={() => payWithBit(t)}
                       className="flex-1 bg-[#10B1B0] hover:opacity-90 transition-all duration-200 active:scale-[0.98] py-2 rounded-lg flex items-center justify-center gap-2 font-body-sm text-body-sm text-white font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tertiary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                     >
                       שלם ב-Bit

@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { CalendarPlus, MailPlus, Users } from 'lucide-react'
+import { CalendarClock, CalendarPlus, MailPlus, Users } from 'lucide-react'
 
 import { Button } from '../../../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card'
@@ -25,6 +25,7 @@ export function GroupPage() {
   const [newStartsAt, setNewStartsAt] = React.useState('') // datetime-local
   const [newLocation, setNewLocation] = React.useState('')
   const [creating, setCreating] = React.useState(false)
+  const [creatingTonight, setCreatingTonight] = React.useState(false)
 
   const refresh = React.useCallback(async () => {
     if (!id) return
@@ -88,6 +89,26 @@ export function GroupPage() {
       toast.push({ title: 'יצירת המשחק נכשלה', description: err instanceof Error ? err.message : String(err) })
     } finally {
       setCreating(false)
+    }
+  }
+
+  async function inviteTonight() {
+    if (!id) return
+    const start = new Date()
+    start.setHours(21, 0, 0, 0)
+    setCreatingTonight(true)
+    try {
+      await store.createGame({
+        groupId: id,
+        title: `${group?.name || 'פוקר'} - הערב`,
+        startsAt: start.getTime(),
+      })
+      await refresh()
+      toast.push({ title: 'זימון להערב נשלח', description: 'נוצר משחק חדש להיום, אפשר לעקוב אחרי ה-RSVP.' })
+    } catch (err: unknown) {
+      toast.push({ title: 'שליחת זימון נכשלה', description: err instanceof Error ? err.message : String(err) })
+    } finally {
+      setCreatingTonight(false)
     }
   }
 
@@ -179,6 +200,12 @@ export function GroupPage() {
               {creating ? 'יוצר…' : 'צור משחק'}
             </Button>
           </form>
+          <div className="mt-3">
+            <Button variant="secondary" onClick={inviteTonight} disabled={creatingTonight}>
+              <CalendarClock className="h-4 w-4" />
+              {creatingTonight ? 'שולח זימון…' : 'זימון להערב'}
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

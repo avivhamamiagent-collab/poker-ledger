@@ -1,13 +1,15 @@
 import { getEnv } from '../config/env'
 import type { LedgerStore } from './store-types'
-import { localStore } from './local-store'
 import { supabaseStore } from './supabase/store'
 
 export function createStore(): LedgerStore {
   const env = getEnv()
-  if (env.storage === 'supabase' && env.supabaseUrl && env.supabaseAnonKey) {
-    console.info('[store] Using Supabase store')
+  if (env.supabaseUrl && env.supabaseAnonKey) {
+    if (env.storage !== 'supabase') {
+      console.warn('[store] VITE_STORAGE is not "supabase"; forcing Supabase mode')
+    }
     return supabaseStore
   }
-  return localStore
+
+  throw new Error('Supabase is not configured. Set VITE_STORAGE=supabase and provide VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY.')
 }
