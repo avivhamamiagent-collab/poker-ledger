@@ -40,10 +40,10 @@ export function SessionsPage() {
   }
 
   async function onDelete(s: Session) {
-    if (!window.confirm('Delete this session? This cannot be undone.')) return
+    if (!window.confirm('למחוק את השולחן הזה? אי אפשר לשחזר אחרי מחיקה.')) return
     await store.deleteSession(s.id)
     setSessions((prev) => prev.filter((x) => x.id !== s.id))
-    toast.push({ title: 'Session deleted', description: s.title || s.dateISO })
+    toast.push({ title: 'השולחן נמחק', description: s.title || s.dateISO })
   }
 
   const activeCount = sessions.filter((s) => totalCashouts(s) === 0 || totalCashouts(s) !== totalBuyins(s)).length

@@ -41,12 +41,16 @@ export function SessionCashoutsPage() {
   const hasCashouts = Object.values(session.cashouts || {}).some((v) => v > 0)
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>יציאות</CardTitle>
-        <CardDescription>נטו = יציאה − סה״כ כניסות.</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>רישום קאשאאוט</CardTitle>
+          <CardDescription>נטו = יציאה פחות סך כל הכניסות של אותו שחקן.</CardDescription>
+        </CardHeader>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-3 p-4">
         {ob.obActive && ob.state.activeSessionId === session.id && !ob.state.done ? (
           <OnboardingBanner
             stepLabel="התחלה מהירה • שלב 3/4"
@@ -64,17 +68,17 @@ export function SessionCashoutsPage() {
         ) : null}
 
         {participants.length === 0 ? (
-          <div className="text-sm text-zinc-500 dark:text-zinc-400">קודם בוחרים משתתפים.</div>
+          <div className="text-sm text-on-surface-variant">קודם בוחרים משתתפים.</div>
         ) : (
           <div className="grid gap-3">
             {participants.map((p) => {
               const cashout = session.cashouts[p.id] || 0
               const net = netForPlayer(session, p.id)
               return (
-                <div key={p.id} className="rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
+                <div key={p.id} className="rounded-xl border border-tertiary/14 bg-black/14 p-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <div className="truncate font-semibold">{p.name}</div>
+                      <div className="truncate font-semibold text-on-surface">{p.name}</div>
                       <div className={cn('text-xs', net >= 0 ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-700 dark:text-red-300')}>
                         נטו: {ils(net)}
                       </div>
@@ -85,7 +89,7 @@ export function SessionCashoutsPage() {
                   </div>
 
                   <div className="mt-3">
-                    <div className="mb-1 text-xs font-medium text-zinc-600 dark:text-zinc-300">יציאה</div>
+                    <div className="mb-1 text-xs font-medium text-on-surface-variant">קאשאאוט</div>
                     <Input
                       inputMode="numeric"
                       value={cashout || ''}
@@ -98,8 +102,8 @@ export function SessionCashoutsPage() {
             })}
           </div>
         )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
-

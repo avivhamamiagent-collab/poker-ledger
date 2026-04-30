@@ -8,7 +8,7 @@ export function SessionAuditPage() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Loading…</CardTitle>
+          <CardTitle>טוען…</CardTitle>
         </CardHeader>
       </Card>
     )
@@ -17,7 +17,7 @@ export function SessionAuditPage() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Couldn’t load audit</CardTitle>
+          <CardTitle>לא הצלחנו לטעון יומן שינויים</CardTitle>
           {error && <CardDescription>{error}</CardDescription>}
         </CardHeader>
       </Card>
@@ -29,20 +29,20 @@ export function SessionAuditPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Audit log</CardTitle>
-        <CardDescription>Newest first.</CardDescription>
+        <CardTitle>יומן שינויים</CardTitle>
+        <CardDescription>האירועים האחרונים מופיעים קודם.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
         {events.length === 0 ? (
-          <div className="text-sm text-zinc-500 dark:text-zinc-400">No events yet.</div>
+          <div className="text-sm text-on-surface-variant">אין עדיין אירועים ביומן.</div>
         ) : (
           events.map((e) => (
-            <div key={e.id} className="rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
+            <div key={e.id} className="rounded-xl border border-tertiary/14 bg-black/14 p-3">
               <div className="flex items-start justify-between gap-3">
-                <div className="font-semibold">{e.type}</div>
-                <div className="text-xs text-zinc-500 dark:text-zinc-400">{new Date(e.ts).toLocaleString()}</div>
+                <div className="font-semibold text-on-surface">{e.type}</div>
+                <div className="text-xs text-on-surface-variant">{new Date(e.ts).toLocaleString('he-IL')}</div>
               </div>
-              <div className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">{e.message}</div>
+              <div className="mt-1 text-sm text-on-surface-variant">{e.message}</div>
             </div>
           ))
         )}
@@ -50,4 +50,3 @@ export function SessionAuditPage() {
     </Card>
   )
 }
-

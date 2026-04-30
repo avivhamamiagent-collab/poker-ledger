@@ -63,7 +63,7 @@ export function RosterPage() {
           </div>
           <div>
             <div className="text-xs font-semibold text-tertiary">רשימת שחקנים</div>
-            <h1 className="text-2xl font-black tracking-tight text-on-surface">רוסטר</h1>
+            <h1 className="text-2xl font-black tracking-tight text-on-surface">רשימת שחקנים</h1>
             <p className="mt-1 text-sm leading-6 text-on-surface-variant">הקבוצה הקבועה שלך. שם וטלפון אופציונלי לכל שחקן.</p>
           </div>
         </div>
@@ -76,12 +76,12 @@ export function RosterPage() {
         </CardHeader>
         <CardContent className="grid gap-2">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <Input placeholder="שם" value={name} onChange={(e) => setName(e.target.value)} />
+            <Input placeholder="שם שחקן" value={name} onChange={(e) => setName(e.target.value)} />
             <Input placeholder="טלפון (אופציונלי)" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
           <Button onClick={add} disabled={!name.trim()}>
             <UserPlus className="h-4 w-4" />
-            הוספה
+            הוסף שחקן
           </Button>
         </CardContent>
       </Card>
@@ -104,7 +104,7 @@ export function RosterPage() {
           <Card>
             <CardHeader>
               <CardTitle>אין עדיין שחקנים</CardTitle>
-              <CardDescription>הוסיפו את הראשון למעלה.</CardDescription>
+              <CardDescription>הוסף שחקן ראשון כדי להשתמש בו בכל שולחן חדש.</CardDescription>
             </CardHeader>
           </Card>
         ) : filtered.length === 0 ? (
@@ -128,7 +128,7 @@ export function RosterPage() {
                   <Pencil className="h-4 w-4" />
                   עריכה
                 </Button>
-                <Button variant="ghost" onClick={() => remove(p)} className="text-red-600 hover:text-red-700">
+                <Button variant="ghost" onClick={() => remove(p)} className="text-red-200 hover:text-red-100">
                   <Trash2 className="h-4 w-4" />
                   הסרה
                 </Button>

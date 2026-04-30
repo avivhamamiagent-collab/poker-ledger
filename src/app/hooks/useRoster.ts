@@ -1,15 +1,15 @@
 import * as React from 'react'
 import type { Player } from '../../domain/types'
 import { useStore } from '../store-context'
-import { RosterContext } from '../roster/roster-context'
+import { useRosterContext } from '../roster/roster-context'
 
 export function useRoster() {
   const store = useStore()
 
   // If we're inside a RosterProvider (AppShell level), use the shared context
-  const ctx = React.useContext(RosterContext)
+  const ctx = useRosterContext()
   if (ctx !== null) {
-    return { roster: ctx, setRoster: () => {}, loading: false, error: null, refresh: () => Promise.resolve() }
+    return ctx
   }
 
   // Otherwise, fall back to direct loading (standalone pages)

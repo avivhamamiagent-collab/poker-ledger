@@ -8,19 +8,10 @@ export function useSession() {
   const { id } = useParams()
   const store = useStore()
   const ctx = useSessionContext()
-  const inProvider = ctx !== null
 
   // If we're inside a SessionProvider (SessionLayout level), use the shared context
-  if (inProvider) {
-    return {
-      id,
-      session: ctx,
-      setSession: () => {},
-      loading: false,
-      error: null,
-      refresh: () => Promise.resolve(),
-      persist: async (_next: Session) => {},
-    }
+  if (ctx !== null) {
+    return { id, ...ctx }
   }
 
   // Otherwise, fall back to direct loading

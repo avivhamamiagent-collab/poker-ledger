@@ -1,28 +1,53 @@
 import * as React from 'react'
 import type { Session } from '../../../domain/types'
 import { useStore } from '../../store-context'
-import { useSessions } from '../../hooks/useSessions'
 
-const SessionContext = React.createContext<Session | null>(null)
+type SessionContextValue = {
+  session: Session | null
+  setSession: React.Dispatch<React.SetStateAction<Session | null>>
+  loading: boolean
+  error: string | null
+  refresh: () => Promise<void>
+  persist: (next: Session) => Promise<void>
+}
+
+const SessionContext = React.createContext<SessionContextValue | null>(null)
 
 export function SessionProvider({ id, children }: { id: string; children: React.ReactNode }) {
   const store = useStore()
-  const { sessions } = useSessions()
   const [session, setSession] = React.useState<Session | null>(null)
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
 
-  React.useEffect(() => {
-    store.getSession(id).then((s) => setSession(s ?? null))
+  const refresh = React.useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const s = await store.getSession(id)
+      setSession(s ?? null)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'לא הצלחנו לטעון שולחן')
+      setSession(null)
+    } finally {
+      setLoading(false)
+    }
   }, [id, store])
 
-  // Sync when sessions update (e.g. after persist)
   React.useEffect(() => {
-    const found = sessions.find((s) => s.id === id)
-    if (found && found !== session) setSession(found)
-  }, [sessions, id])
+    refresh().catch(() => {})
+  }, [refresh])
 
-  return <SessionContext.Provider value={session}>{children}</SessionContext.Provider>
+  const persist = React.useCallback(
+    async (next: Session) => {
+      await store.putSession(next)
+      setSession(next)
+    },
+    [store],
+  )
+
+  return <SessionContext.Provider value={{ session, setSession, loading, error, refresh, persist }}>{children}</SessionContext.Provider>
 }
 
-export function useSessionContext(): Session | null {
+export function useSessionContext(): SessionContextValue | null {
   return React.useContext(SessionContext)
 }

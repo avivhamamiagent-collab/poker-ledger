@@ -40,15 +40,6 @@ async function clearLegacyAppDataOnce() {
 
 async function clearStaleBrowserState() {
   try {
-    if ('serviceWorker' in navigator) {
-      const regs = await navigator.serviceWorker.getRegistrations()
-      await Promise.all(regs.map((reg) => reg.unregister()))
-    }
-  } catch {
-    // ignore
-  }
-
-  try {
     if ('caches' in window) {
       const keys = await caches.keys()
       await Promise.all(keys.map((key) => caches.delete(key)))
@@ -59,6 +50,15 @@ async function clearStaleBrowserState() {
 }
 
 void Promise.all([clearLegacyAppDataOnce(), clearStaleBrowserState()])
+
+async function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return
+  try {
+    await navigator.serviceWorker.register('/sw.js')
+  } catch {
+    // ignore
+  }
+}
 
 const rootEl = document.getElementById('root')
 if (rootEl && !rootEl.hasChildNodes()) {
@@ -117,6 +117,4 @@ bootstrap().catch((err) => {
     `
   }
 })
-
-// Temporarily disable SW registration while stabilizing first paint.
-// It can be re-enabled after the blank-screen path is fully resolved.
+void registerServiceWorker()
