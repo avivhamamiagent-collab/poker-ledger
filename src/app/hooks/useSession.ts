@@ -6,13 +6,10 @@ import { useSessionContext } from '../pages/session/session-context'
 
 export function useSession() {
   const { id } = useParams()
+
+  // Hooks must be called unconditionally.
   const store = useStore()
   const ctx = useSessionContext()
-
-  // If we're inside a SessionProvider (SessionLayout level), use the shared context
-  if (ctx !== null) {
-    return { id, ...ctx }
-  }
 
   // Otherwise, fall back to direct loading
   const [session, setSession] = React.useState<Session | null>(null)
@@ -20,7 +17,10 @@ export function useSession() {
   const [error, setError] = React.useState<string | null>(null)
 
   const refresh = React.useCallback(async () => {
+    // If we're inside a SessionProvider (SessionLayout level), let context own it.
+    if (ctx !== null) return
     if (!id) return
+
     setLoading(true)
     setError(null)
     try {
@@ -32,7 +32,7 @@ export function useSession() {
     } finally {
       setLoading(false)
     }
-  }, [id, store])
+  }, [ctx, id, store])
 
   React.useEffect(() => {
     refresh()
@@ -40,11 +40,13 @@ export function useSession() {
 
   const persist = React.useCallback(
     async (next: Session) => {
+      // If context exists, it should handle persistence.
+      if (ctx !== null) return
       await store.putSession(next)
       setSession(next)
     },
-    [store],
+    [ctx, store],
   )
 
-  return { id, session, setSession, loading, error, refresh, persist }
+  return ctx !== null ? { id, ...ctx } : { id, session, setSession, loading, error, refresh, persist }
 }

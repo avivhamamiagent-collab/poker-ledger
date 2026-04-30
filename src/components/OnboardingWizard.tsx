@@ -100,7 +100,9 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
     if (!user) return
     try {
       localStorage.setItem(storageKey(user.id), 'true')
-    } catch {}
+    } catch {
+      // ignore
+    }
     setOpen(false)
     onComplete?.()
     nav('/groups', { replace: true })
@@ -110,7 +112,9 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
     if (!user) return
     try {
       localStorage.setItem(storageKey(user.id), 'true')
-    } catch {}
+    } catch {
+      // ignore
+    }
     setOpen(false)
   }
 

@@ -4,13 +4,9 @@ import { useStore } from '../store-context'
 import { useRosterContext } from '../roster/roster-context'
 
 export function useRoster() {
+  // Hooks must be called unconditionally.
   const store = useStore()
-
-  // If we're inside a RosterProvider (AppShell level), use the shared context
   const ctx = useRosterContext()
-  if (ctx !== null) {
-    return ctx
-  }
 
   // Otherwise, fall back to direct loading (standalone pages)
   const [roster, setRoster] = React.useState<Player[]>([])
@@ -18,6 +14,9 @@ export function useRoster() {
   const [error, setError] = React.useState<string | null>(null)
 
   const refresh = React.useCallback(async () => {
+    // If we're inside a RosterProvider (AppShell level), let context own it.
+    if (ctx !== null) return
+
     setLoading(true)
     setError(null)
     try {
@@ -27,11 +26,11 @@ export function useRoster() {
     } finally {
       setLoading(false)
     }
-  }, [store])
+  }, [ctx, store])
 
   React.useEffect(() => {
     refresh()
   }, [refresh])
 
-  return { roster, setRoster, loading, error, refresh }
+  return ctx ?? { roster, setRoster, loading, error, refresh }
 }

@@ -106,8 +106,7 @@ export function SessionExportPage() {
           <Button
             variant="secondary"
             onClick={async () => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const nav: any = navigator
+              const nav = navigator as unknown as { share?: (data: { text: string }) => Promise<void> }
               if (nav.share) {
                 await nav.share({ text })
               } else {

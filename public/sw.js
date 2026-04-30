@@ -45,8 +45,8 @@ self.addEventListener('fetch', (event) => {
           }
           return resp
         })
-        .catch(() => cached || Response.error()),
-    }),
+        .catch(() => cached || Response.error())
+    })
   )
 })
 

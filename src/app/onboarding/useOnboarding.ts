@@ -22,9 +22,12 @@ export function useOnboarding(session?: Session | null) {
     update({ done: false, step: 'participants', activeSessionId: sessionId, startedAt: Date.now() })
   }
 
-  function setStep(step: OnboardingStep) {
-    update({ ...state, step })
-  }
+  const setStep = React.useCallback(
+    (step: OnboardingStep) => {
+      update({ ...state, step })
+    },
+    [state],
+  )
 
   function complete() {
     update({ done: true, step: 'done' })
@@ -49,7 +52,7 @@ export function useOnboarding(session?: Session | null) {
     if (state.step === 'entries' && entriesOk && path.includes('/entries')) setStep('cashout')
     if (state.step === 'cashout' && cashoutOk && path.includes('/cashout')) setStep('settlement')
     if (state.step === 'settlement' && settlementOk && path.includes('/settlement')) setStep('done')
-  }, [location.pathname, obActive, session, state.activeSessionId, state.step])
+  }, [location.pathname, obActive, session, state.activeSessionId, state.step, setStep])
 
   return { state, obActive, start, setStep, complete }
 }
