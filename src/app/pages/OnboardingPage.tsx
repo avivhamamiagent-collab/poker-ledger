@@ -6,6 +6,7 @@ import { createSession } from '../../domain/session'
 import { useStore } from '../store-context'
 import { useOnboarding } from '../onboarding/useOnboarding'
 import { useToast } from '../../components/ui/use-toast'
+import { formatError, isNotAuthenticatedError } from '../../lib/errors'
 
 export function OnboardingPage() {
   const store = useStore()
@@ -20,8 +21,11 @@ export function OnboardingPage() {
       ob.start(s.id)
       nav(`/session/${s.id}/participants?ob=1`)
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'יצירת שולחן נכשלה'
-      toast.push({ title: 'לא הצלחנו לפתוח שולחן', description: msg })
+      if (isNotAuthenticatedError(e)) {
+        nav('/login', { replace: true, state: { from: '/onboarding' } })
+        return
+      }
+      toast.push({ title: 'לא הצלחנו לפתוח שולחן', description: formatError(e) || 'יצירת שולחן נכשלה' })
     }
   }
 

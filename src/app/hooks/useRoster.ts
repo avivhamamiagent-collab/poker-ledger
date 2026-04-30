@@ -2,11 +2,15 @@ import * as React from 'react'
 import type { Player } from '../../domain/types'
 import { useStore } from '../store-context'
 import { useRosterContext } from '../roster/roster-context'
+import { formatError, isNotAuthenticatedError } from '../../lib/errors'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 export function useRoster() {
   // Hooks must be called unconditionally.
   const store = useStore()
   const ctx = useRosterContext()
+  const nav = useNavigate()
+  const location = useLocation()
 
   // Otherwise, fall back to direct loading (standalone pages)
   const [roster, setRoster] = React.useState<Player[]>([])
@@ -22,11 +26,15 @@ export function useRoster() {
     try {
       setRoster(await store.listPlayers())
     } catch (e: any) {
-      setError(e?.message || 'Failed to load roster')
+      if (isNotAuthenticatedError(e)) {
+        nav('/login', { replace: true, state: { from: location.pathname } })
+        return
+      }
+      setError(formatError(e) || 'לא הצלחנו לטעון שחקנים')
     } finally {
       setLoading(false)
     }
-  }, [ctx, store])
+  }, [ctx, store, nav, location.pathname])
 
   React.useEffect(() => {
     refresh()

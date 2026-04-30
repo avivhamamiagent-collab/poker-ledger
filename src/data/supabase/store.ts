@@ -19,10 +19,12 @@ function toIsoDate(dateISO: string): string {
 
 async function requireUserId(): Promise<string> {
   const sb = supabase()
-  const { data, error } = await sb.auth.getUser()
+  // Use getSession() (local) instead of getUser() (network) to avoid spurious
+  // "Not authenticated" when offline / on flaky connections.
+  const { data, error } = await sb.auth.getSession()
   if (error) throw error
-  if (!data.user) throw new Error('Not authenticated')
-  return data.user.id
+  if (!data.session?.user) throw new Error('Not authenticated')
+  return data.session.user.id
 }
 
 function ms(ts: string | number | Date): number {
@@ -463,4 +465,3 @@ export const supabaseStore: LedgerStore = {
     if (error) throw error
   },
 }
-

@@ -11,6 +11,7 @@ import { useToast } from '../../components/ui/use-toast'
 import { getEnv } from '../../config/env'
 import { useInstallPrompt } from '../pwa/useInstallPrompt'
 import { ils } from '../../lib/money'
+import { formatError, isNotAuthenticatedError } from '../../lib/errors'
 
 export function SessionsPage() {
   const store = useStore()
@@ -34,8 +35,11 @@ export function SessionsPage() {
       await persist(s)
       nav(`/session/${s.id}/entries`)
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : 'יצירת שולחן נכשלה'
-      toast.push({ title: 'לא הצלחנו לפתוח שולחן', description: msg })
+      if (isNotAuthenticatedError(e)) {
+        nav('/login', { replace: true, state: { from: '/sessions' } })
+        return
+      }
+      toast.push({ title: 'לא הצלחנו לפתוח שולחן', description: formatError(e) || 'יצירת שולחן נכשלה' })
     }
   }
 
