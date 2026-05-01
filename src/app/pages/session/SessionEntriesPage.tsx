@@ -1,5 +1,6 @@
 import { Minus, Plus } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { SkeletonCard } from '../../../components/ui/skeleton'
 
 import { useRoster } from '../../hooks/useRoster'
 import { useSession } from '../../hooks/useSession'
@@ -17,7 +18,7 @@ export function SessionEntriesPage() {
   const ob = useOnboarding(session)
 
   if (loading) {
-    return <div className="text-body-sm font-body-sm text-on-surface-variant">טוען…</div>
+    return <SkeletonCard rows={4} />
   }
   if (error || !session) {
     return <div className="text-body-sm font-body-sm text-error">לא הצלחנו לטעון כניסות</div>

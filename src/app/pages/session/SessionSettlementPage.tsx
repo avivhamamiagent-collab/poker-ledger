@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { SkeletonCard } from '../../../components/ui/skeleton'
 
 import { useRoster } from '../../hooks/useRoster'
 import { useSession } from '../../hooks/useSession'
@@ -17,7 +18,7 @@ export function SessionSettlementPage() {
   const nav = useNavigate()
   const ob = useOnboarding(session)
 
-  if (loading) return <div className="text-body-sm font-body-sm text-on-surface-variant">טוען…</div>
+  if (loading) return <SkeletonCard rows={3} />
   if (error || !session) return <div className="text-body-sm font-body-sm text-error">לא הצלחנו לטעון סגירה</div>
 
   const d = delta(session)

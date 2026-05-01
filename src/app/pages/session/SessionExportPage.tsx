@@ -3,6 +3,7 @@ import * as React from 'react'
 import type { Player, Session } from '../../../domain/types'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card'
 import { Button } from '../../../components/ui/button'
+import { SkeletonCard } from '../../../components/ui/skeleton'
 import { useRoster } from '../../hooks/useRoster'
 import { useSession } from '../../hooks/useSession'
 import { computeSettlement } from '../../../domain/settlement'
@@ -68,13 +69,7 @@ export function SessionExportPage() {
   }, [session, roster])
 
   if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>טוען…</CardTitle>
-        </CardHeader>
-      </Card>
-    )
+    return <SkeletonCard rows={3} />
   }
   if (error || !session) {
     return (

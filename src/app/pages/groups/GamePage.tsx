@@ -4,6 +4,7 @@ import { CalendarClock, Check, CircleHelp, X } from 'lucide-react'
 
 import { Button } from '../../../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card'
+import { Skeleton } from '../../../components/ui/skeleton'
 import { useToast } from '../../../components/ui/use-toast'
 import type { Game, GameParticipant, GameRsvp } from '../../../domain/types'
 import { useAuth } from '../../auth/auth-context'
@@ -121,7 +122,10 @@ export function GamePage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-sm text-on-surface-variant">טוען…</div>
+            <div className="space-y-2">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </div>
           ) : rsvps.length === 0 ? (
             <div className="text-sm text-on-surface-variant">אין תגובות עדיין.</div>
           ) : (

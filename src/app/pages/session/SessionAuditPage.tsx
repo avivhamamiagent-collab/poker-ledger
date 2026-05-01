@@ -1,17 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card'
 import { useSession } from '../../hooks/useSession'
+import { SkeletonCard } from '../../../components/ui/skeleton'
 
 export function SessionAuditPage() {
   const { session, loading, error } = useSession()
 
   if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>טוען…</CardTitle>
-        </CardHeader>
-      </Card>
-    )
+    return <SkeletonCard rows={2} />
   }
   if (error || !session) {
     return (

@@ -3,6 +3,8 @@ import { ArrowRight, CircleDollarSign, Trash2, Users } from 'lucide-react'
 
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card'
 import { Button } from '../../../components/ui/button'
+import { SkeletonCard } from '../../../components/ui/skeleton'
+import { useConfirm } from '../../../components/ui/confirm-dialog'
 import { useSession } from '../../hooks/useSession'
 import { useRoster } from '../../hooks/useRoster'
 import { delta, totalBuyins, totalCashouts } from '../../../domain/session'
@@ -16,15 +18,10 @@ function SessionContent() {
   const { roster } = useRoster()
   const store = useStore()
   const nav = useNavigate()
+  const { confirm, dialog: confirmDialog } = useConfirm()
 
   if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>טוען שולחן…</CardTitle>
-        </CardHeader>
-      </Card>
-    )
+    return <SkeletonCard rows={3} />
   }
 
   if (error || !session) {
@@ -69,7 +66,13 @@ function SessionContent() {
             variant="ghost"
             className="text-red-200 hover:text-red-100"
             onClick={async () => {
-              if (!window.confirm('למחוק את השולחן הזה? אי אפשר לשחזר.')) return
+              const ok = await confirm({
+                title: 'מחיקת שולחן',
+                description: `"${session.title || session.dateISO}" יימחק לצמיתות.`,
+                confirmLabel: 'מחיקה',
+                destructive: true,
+              })
+              if (!ok) return
               await store.deleteSession(session.id)
               nav('/')
             }}
@@ -112,6 +115,7 @@ function SessionContent() {
       </div>
 
       <Outlet context={{ session, roster }} />
+      {confirmDialog}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card'
 import { Input } from '../../../components/ui/input'
+import { SkeletonCard } from '../../../components/ui/skeleton'
 import { participantsForSession, netForPlayer } from '../../../domain/selectors'
 import { setCashout } from '../../../domain/session'
 import { useRoster } from '../../hooks/useRoster'
@@ -17,13 +18,7 @@ export function SessionCashoutsPage() {
   const ob = useOnboarding(session)
 
   if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>טוען…</CardTitle>
-        </CardHeader>
-      </Card>
-    )
+    return <SkeletonCard rows={4} />
   }
   if (error || !session) {
     return (

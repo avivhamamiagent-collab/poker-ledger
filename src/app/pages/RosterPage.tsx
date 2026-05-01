@@ -1,11 +1,13 @@
 import * as React from 'react'
-import { Pencil, Search, Trash2, UserPlus } from 'lucide-react'
+import { Check, Pencil, Search, Trash2, UserPlus, X } from 'lucide-react'
 
 import type { Player } from '../../domain/types'
 import { id } from '../../domain/ids'
 import { Button } from '../../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
 import { Input } from '../../components/ui/input'
+import { SkeletonList } from '../../components/ui/skeleton'
+import { useConfirm } from '../../components/ui/confirm-dialog'
 import { useStore } from '../store-context'
 import { useRoster } from '../hooks/useRoster'
 import { useToast } from '../../components/ui/use-toast'
@@ -14,10 +16,14 @@ export function RosterPage() {
   const store = useStore()
   const { roster, setRoster, loading, error } = useRoster()
   const toast = useToast()
+  const { confirm, dialog: confirmDialog } = useConfirm()
 
   const [name, setName] = React.useState('')
   const [phone, setPhone] = React.useState('')
   const [q, setQ] = React.useState('')
+  const [editingId, setEditingId] = React.useState<string | null>(null)
+  const [editName, setEditName] = React.useState('')
+  const [editPhone, setEditPhone] = React.useState('')
 
   async function add() {
     const n = name.trim()
@@ -30,19 +36,28 @@ export function RosterPage() {
     toast.push({ title: 'שחקן נוסף', description: p.name })
   }
 
-  async function edit(p: Player) {
-    const nextName = window.prompt('עריכת שם:', p.name)
-    if (nextName === null) return
-    const nextPhone = window.prompt('עריכת טלפון (אופציונלי):', p.phone || '')
-    if (nextPhone === null) return
-    const next: Player = { ...p, name: nextName.trim() || p.name, phone: nextPhone.trim() || undefined }
+  function startEdit(p: Player) {
+    setEditingId(p.id)
+    setEditName(p.name)
+    setEditPhone(p.phone || '')
+  }
+
+  async function saveEdit(p: Player) {
+    const next: Player = { ...p, name: editName.trim() || p.name, phone: editPhone.trim() || undefined }
     await store.putPlayer(next)
     setRoster((prev) => prev.map((x) => (x.id === p.id ? next : x)).sort((a, b) => a.name.localeCompare(b.name)))
+    setEditingId(null)
     toast.push({ title: 'שחקן עודכן', description: next.name })
   }
 
   async function remove(p: Player) {
-    if (!window.confirm('להסיר מהרוסטר?')) return
+    const ok = await confirm({
+      title: 'הסרת שחקן',
+      description: `${p.name} יוסר מהרוסטר לצמיתות.`,
+      confirmLabel: 'הסרה',
+      destructive: true,
+    })
+    if (!ok) return
     await store.deletePlayer(p.id)
     setRoster((prev) => prev.filter((x) => x.id !== p.id))
     toast.push({ title: 'שחקן הוסר', description: p.name })
@@ -76,7 +91,12 @@ export function RosterPage() {
         </CardHeader>
         <CardContent className="grid gap-2">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <Input placeholder="שם שחקן" value={name} onChange={(e) => setName(e.target.value)} />
+            <Input
+              placeholder="שם שחקן"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && add()}
+            />
             <Input placeholder="טלפון (אופציונלי)" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
           <Button onClick={add} disabled={!name.trim()}>
@@ -95,11 +115,7 @@ export function RosterPage() {
 
       <div className="grid gap-3">
         {loading ? (
-          <Card>
-            <CardHeader>
-              <CardTitle>טוען…</CardTitle>
-            </CardHeader>
-          </Card>
+          <SkeletonList count={4} />
         ) : roster.length === 0 ? (
           <Card>
             <CardHeader>
@@ -115,28 +131,60 @@ export function RosterPage() {
             </CardHeader>
           </Card>
         ) : (
-          filtered.map((p) => (
-            <Card key={p.id}>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center justify-between gap-3">
-                  <span className="truncate">{p.name}</span>
-                  {p.phone && <span className="text-xs font-normal text-on-surface-variant">{p.phone}</span>}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex items-center justify-end gap-2">
-                <Button variant="secondary" onClick={() => edit(p)}>
-                  <Pencil className="h-4 w-4" />
-                  עריכה
-                </Button>
-                <Button variant="ghost" onClick={() => remove(p)} className="text-red-200 hover:text-red-100">
-                  <Trash2 className="h-4 w-4" />
-                  הסרה
-                </Button>
-              </CardContent>
-            </Card>
-          ))
+          filtered.map((p) =>
+            editingId === p.id ? (
+              <Card key={p.id} className="border-tertiary/30">
+                <CardContent className="grid gap-2 p-4">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <Input
+                      autoFocus
+                      placeholder="שם שחקן"
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && saveEdit(p)}
+                    />
+                    <Input
+                      placeholder="טלפון (אופציונלי)"
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button variant="ghost" onClick={() => setEditingId(null)} aria-label="ביטול עריכה">
+                      <X className="h-4 w-4" />
+                      ביטול
+                    </Button>
+                    <Button onClick={() => saveEdit(p)} aria-label="שמירת שחקן">
+                      <Check className="h-4 w-4" />
+                      שמירה
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <Card key={p.id}>
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center justify-between gap-3">
+                    <span className="truncate">{p.name}</span>
+                    {p.phone && <span className="text-xs font-normal text-on-surface-variant">{p.phone}</span>}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="flex items-center justify-end gap-2">
+                  <Button variant="secondary" onClick={() => startEdit(p)} aria-label={`עריכת ${p.name}`}>
+                    <Pencil className="h-4 w-4" />
+                    עריכה
+                  </Button>
+                  <Button variant="ghost" onClick={() => remove(p)} className="text-red-200 hover:text-red-100" aria-label={`הסרת ${p.name}`}>
+                    <Trash2 className="h-4 w-4" />
+                    הסרה
+                  </Button>
+                </CardContent>
+              </Card>
+            ),
+          )
         )}
       </div>
+      {confirmDialog}
     </div>
   )
 }

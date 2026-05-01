@@ -4,6 +4,7 @@ import { CalendarClock, ChevronLeft, Mail, Plus, UsersRound } from 'lucide-react
 
 import { Button } from '../../../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../../components/ui/card'
+import { SkeletonList } from '../../../components/ui/skeleton'
 import { useToast } from '../../../components/ui/use-toast'
 import type { GroupInvite } from '../../../domain/types'
 import { useGroups } from '../../hooks/useGroups'
@@ -114,12 +115,7 @@ export function GroupsPage() {
       ) : null}
 
       {loading ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>טוען קבוצות…</CardTitle>
-            <CardDescription>אוסף את רשימת הקבוצות שלך.</CardDescription>
-          </CardHeader>
-        </Card>
+        <SkeletonList count={3} />
       ) : filtered.length === 0 ? (
         <Card className="text-center">
           <CardHeader className="items-center">

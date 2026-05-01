@@ -5,6 +5,7 @@ import { CalendarClock, CalendarPlus, MailPlus, Users } from 'lucide-react'
 import { Button } from '../../../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card'
 import { Input } from '../../../components/ui/input'
+import { Skeleton } from '../../../components/ui/skeleton'
 import { useToast } from '../../../components/ui/use-toast'
 import type { Game, Group, GroupMember } from '../../../domain/types'
 import { useStore } from '../../store-context'
@@ -170,7 +171,10 @@ export function GroupPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-sm text-on-surface-variant">טוען…</div>
+            <div className="space-y-2">
+              <Skeleton className="h-14 w-full" />
+              <Skeleton className="h-14 w-full" />
+            </div>
           ) : members.length === 0 ? (
             <div className="text-sm text-on-surface-variant">אין חברים עדיין.</div>
           ) : (
@@ -217,7 +221,10 @@ export function GroupPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-sm text-on-surface-variant">טוען…</div>
+            <div className="space-y-2">
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+            </div>
           ) : games.length === 0 ? (
             <div className="text-sm text-on-surface-variant">אין משחקים עדיין. אפשר ליצור אחד למעלה.</div>
           ) : (

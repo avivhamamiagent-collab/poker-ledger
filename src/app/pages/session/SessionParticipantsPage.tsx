@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { CheckCircle2, Circle, UserPlus } from 'lucide-react'
+import { SkeletonCard } from '../../../components/ui/skeleton'
 
 import type { Player } from '../../../domain/types'
 import { addParticipant, removeParticipant } from '../../../domain/session'
@@ -28,13 +29,7 @@ export function SessionParticipantsPage() {
   const [phone, setPhone] = React.useState('')
 
   if (loading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>טוען…</CardTitle>
-        </CardHeader>
-      </Card>
-    )
+    return <SkeletonCard rows={3} />
   }
   if (error || !session) {
     return (

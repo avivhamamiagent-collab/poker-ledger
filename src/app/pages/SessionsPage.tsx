@@ -5,6 +5,8 @@ import { createSession, totalBuyins, totalCashouts } from '../../domain/session'
 import type { Session } from '../../domain/types'
 import { Button } from '../../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
+import { SkeletonList } from '../../components/ui/skeleton'
+import { useConfirm } from '../../components/ui/confirm-dialog'
 import { useStore } from '../store-context'
 import { useSessions } from '../hooks/useSessions'
 import { useToast } from '../../components/ui/use-toast'
@@ -16,6 +18,7 @@ import { formatError, isNotAuthenticatedError } from '../../lib/errors'
 export function SessionsPage() {
   const store = useStore()
   const { sessions, setSessions, loading, error } = useSessions()
+  const { confirm, dialog: confirmDialog } = useConfirm()
   const nav = useNavigate()
   const toast = useToast()
   const env = getEnv()
@@ -44,7 +47,13 @@ export function SessionsPage() {
   }
 
   async function onDelete(s: Session) {
-    if (!window.confirm('למחוק את השולחן הזה? אי אפשר לשחזר אחרי מחיקה.')) return
+    const ok = await confirm({
+      title: 'מחיקת שולחן',
+      description: `"${s.title || s.dateISO}" יימחק לצמיתות. אי אפשר לשחזר.`,
+      confirmLabel: 'מחיקה',
+      destructive: true,
+    })
+    if (!ok) return
     await store.deleteSession(s.id)
     setSessions((prev) => prev.filter((x) => x.id !== s.id))
     toast.push({ title: 'השולחן נמחק', description: s.title || s.dateISO })
@@ -105,12 +114,7 @@ export function SessionsPage() {
       {error && <div className="rounded-xl border border-red-400/20 bg-red-500/10 p-3 text-sm text-red-200">{error}</div>}
 
       {loading ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>טוען…</CardTitle>
-            <CardDescription>מושך נתונים מהאחסון.</CardDescription>
-          </CardHeader>
-        </Card>
+        <SkeletonList count={3} />
       ) : sessions.length === 0 ? (
         <Card className="text-center">
           <CardHeader className="items-center">
@@ -167,6 +171,7 @@ export function SessionsPage() {
         <span className="font-medium">{env.storage === 'supabase' ? 'Supabase (רב-מכשירי)' : 'IndexedDB מקומי'}</span>
         {env.storage === 'supabase' ? null : '. נשמר מקומית כברירת מחדל.'}
       </p>
+      {confirmDialog}
     </div>
   )
 }
