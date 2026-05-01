@@ -22,12 +22,13 @@ export function useOnboarding(session?: Session | null) {
     update({ done: false, step: 'participants', activeSessionId: sessionId, startedAt: Date.now() })
   }
 
-  const setStep = React.useCallback(
-    (step: OnboardingStep) => {
-      update({ ...state, step })
-    },
-    [state],
-  )
+  const setStep = React.useCallback((step: OnboardingStep) => {
+    setState((prev) => {
+      const next = { ...prev, step }
+      saveOnboarding(next)
+      return next
+    })
+  }, [])
 
   function complete() {
     update({ done: true, step: 'done' })
@@ -45,13 +46,14 @@ export function useOnboarding(session?: Session | null) {
     const cashoutOk = Object.values(session.cashouts || {}).some((v) => v > 0)
     const settlementOk = Math.abs(delta(session)) < 0.0001
 
-    const path = location.pathname
+    const isSessionRoute = location.pathname.startsWith(`/session/${session.id}`) || location.pathname.startsWith(`/sessions/${session.id}`)
 
     // Only advance, never go backwards automatically
-    if (state.step === 'participants' && participantsOk && path.includes('/participants')) setStep('entries')
-    if (state.step === 'entries' && entriesOk && path.includes('/entries')) setStep('cashout')
-    if (state.step === 'cashout' && cashoutOk && path.includes('/cashout')) setStep('settlement')
-    if (state.step === 'settlement' && settlementOk && path.includes('/settlement')) setStep('done')
+    if (!isSessionRoute) return
+    if (state.step === 'participants' && participantsOk) setStep('entries')
+    if (state.step === 'entries' && entriesOk) setStep('cashout')
+    if (state.step === 'cashout' && cashoutOk) setStep('settlement')
+    if (state.step === 'settlement' && settlementOk) setStep('done')
   }, [location.pathname, obActive, session, state.activeSessionId, state.step, setStep])
 
   return { state, obActive, start, setStep, complete }

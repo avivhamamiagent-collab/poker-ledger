@@ -72,11 +72,13 @@ export function GroupPage() {
       return
     }
 
+    const title = newTitle.trim() || `${group?.name || 'פוקר'} - משחק חדש`
+
     setCreating(true)
     try {
       await store.createGame({
         groupId: id,
-        title: newTitle.trim(),
+        title,
         startsAt: startsAtMs,
         location: newLocation.trim() || undefined,
       })

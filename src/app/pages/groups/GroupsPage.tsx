@@ -40,6 +40,10 @@ export function GroupsPage() {
       await store.respondToInvite(inviteId, status)
       await Promise.all([refresh(), loadInvites()])
       toast.push({ title: status === 'accepted' ? 'הצטרפת לקבוצה' : 'ההזמנה נדחתה' })
+      if (status === 'accepted') {
+        await refresh()
+        await loadInvites()
+      }
     } catch (err: unknown) {
       toast.push({ title: 'נכשל', description: err instanceof Error ? err.message : String(err) })
     }

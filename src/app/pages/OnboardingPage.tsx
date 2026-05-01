@@ -19,7 +19,7 @@ export function OnboardingPage() {
       const s = createSession(undefined)
       await store.putSession(s)
       ob.start(s.id)
-      nav(`/session/${s.id}/participants?ob=1`)
+      nav(`/session/${s.id}/participants?ob=1`, { replace: true })
     } catch (e: unknown) {
       if (isNotAuthenticatedError(e)) {
         nav('/login', { replace: true, state: { from: '/onboarding' } })

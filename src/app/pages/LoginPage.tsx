@@ -32,12 +32,16 @@ export function LoginPage() {
     setLoading(true)
     try {
       if (isSignUp) {
-        await signUp(email, password, displayName)
+        const user = await signUp(email, password, displayName)
+        if (!user) {
+          toast.push({ title: 'נרשמת בהצלחה', description: 'יש לאשר את האימייל לפני הכניסה.' })
+          return
+        }
         toast.push({ title: 'נרשמת בהצלחה', description: 'ברוכים הבאים לפנקס פוקר.' })
       } else {
         await signIn(email, password)
+        toast.push({ title: 'הכניסה הצליחה', description: 'מעביר אותך לאפליקציה…' })
       }
-      navigate('/', { replace: true })
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err)
       toast.push({ title: isSignUp ? 'ההרשמה נכשלה' : 'הכניסה נכשלה', description: msg })

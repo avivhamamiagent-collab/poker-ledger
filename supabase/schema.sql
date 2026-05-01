@@ -218,6 +218,8 @@ create policy "audit_events_select_own" on public.audit_events
 for select using (user_id = auth.uid());
 create policy "audit_events_insert_own" on public.audit_events
 for insert with check (user_id = auth.uid());
+create policy "audit_events_delete_own" on public.audit_events
+for delete using (user_id = auth.uid());
 
 -- groups: any authenticated user can select groups they are a member of
 create policy "groups_select_member" on public.groups

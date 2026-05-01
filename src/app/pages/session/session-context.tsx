@@ -18,6 +18,11 @@ export function SessionProvider({ id, children }: { id: string; children: React.
   const [session, setSession] = React.useState<Session | null>(null)
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
+  // Persist calls can happen rapidly (e.g. typing). Since our Supabase
+  // persistence overwrites child tables, concurrent writes can race and cause
+  // stale state to win. Serialize writes and make "latest call wins".
+  const persistQueue = React.useRef(Promise.resolve())
+  const persistVersion = React.useRef(0)
 
   const refresh = React.useCallback(async () => {
     setLoading(true)
@@ -39,8 +44,19 @@ export function SessionProvider({ id, children }: { id: string; children: React.
 
   const persist = React.useCallback(
     async (next: Session) => {
-      await store.putSession(next)
-      setSession(next)
+      const myVersion = ++persistVersion.current
+
+      persistQueue.current = persistQueue.current
+        .catch(() => {})
+        .then(async () => {
+          // If a newer persist() was scheduled, skip this write.
+          if (myVersion !== persistVersion.current) return
+          await store.putSession(next)
+          // Only apply if still the newest.
+          if (myVersion === persistVersion.current) setSession(next)
+        })
+
+      return persistQueue.current
     },
     [store],
   )

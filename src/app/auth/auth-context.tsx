@@ -22,6 +22,9 @@ export async function signUp(email: string, password: string, displayName: strin
     },
   )
   if (error) throw error
+  // If email confirmation is enabled, data.session is null and data.user may be
+  // a partial object. Return null so callers can detect the pending-confirmation case.
+  if (!data.session) return null
   return data.user
 }
 

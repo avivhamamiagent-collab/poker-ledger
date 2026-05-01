@@ -36,21 +36,22 @@ Deno.serve(async (req) => {
     if (updErr) throw updErr
 
     if (status === 'accepted') {
-      // add membership (idempotent)
-      await svc
+      const { error: memberErr } = await svc
         .from('group_members')
         .upsert({ group_id: inv.group_id, user_id: u.user.id, role: 'member' }, { onConflict: 'group_id,user_id' })
+      if (memberErr) throw memberErr
 
       // notify owners
-      const { data: owners } = await svc
+      const { data: owners, error: ownersErr } = await svc
         .from('group_members')
         .select('user_id')
         .eq('group_id', inv.group_id)
         .eq('role', 'owner')
+      if (ownersErr) throw ownersErr
 
       const ownerIds = (owners ?? []).map((o: any) => o.user_id)
       if (ownerIds.length) {
-        await svc.from('notifications').insert(
+        const { error: notifErr } = await svc.from('notifications').insert(
           ownerIds.map((oid: string) => ({
             user_id: oid,
             type: 'invite_accepted',
@@ -59,6 +60,7 @@ Deno.serve(async (req) => {
             data: { groupId: inv.group_id },
           })),
         )
+        if (notifErr) throw notifErr
         await sendPushToUsers(svc, ownerIds, {
           title: 'Poker Ledger — Invite accepted',
           body: `${u.user.email} joined your group.`,
@@ -67,7 +69,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ ok: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    return new Response(JSON.stringify({ ok: true, groupId: inv.group_id, status }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   } catch (e) {
     return new Response(JSON.stringify({ error: String((e as any)?.message ?? e) }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
