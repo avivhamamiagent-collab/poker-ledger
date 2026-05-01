@@ -14,18 +14,39 @@ const AuthContext = React.createContext<AuthState | null>(null)
 
 export async function signUp(email: string, password: string, displayName: string) {
   const sb = supabase()
-  const { data, error } = await sb.auth.signUp(
-    {
-      email,
-      password,
-      options: { data: { display_name: displayName } },
-    },
-  )
+  const { data, error } = await sb.auth.signUp({
+    email,
+    password,
+    options: { data: { display_name: displayName } },
+  })
   if (error) throw error
   // If email confirmation is enabled, data.session is null and data.user may be
   // a partial object. Return null so callers can detect the pending-confirmation case.
   if (!data.session) return null
+
+  // Profile is auto-created by `on_auth_user_created` trigger.
+  // Best-effort: create a default roster player so the user can start a session immediately.
+  if (data.user) {
+    try {
+      await sb.from('players').insert({ user_id: data.user.id, name: displayName || email.split('@')[0] })
+    } catch {
+      // non-blocking: roster page lets the user add players later
+    }
+  }
   return data.user
+}
+
+export async function requestPasswordReset(email: string) {
+  const sb = supabase()
+  const redirectTo = `${window.location.origin}/reset-password`
+  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo })
+  if (error) throw error
+}
+
+export async function updatePassword(newPassword: string) {
+  const sb = supabase()
+  const { error } = await sb.auth.updateUser({ password: newPassword })
+  if (error) throw error
 }
 
 export async function signIn(email: string, password: string) {

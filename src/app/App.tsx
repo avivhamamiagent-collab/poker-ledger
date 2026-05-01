@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { ToastsProvider } from '../components/ui/use-toast'
 import { Toaster } from '../components/ui/toaster'
+import { ErrorBoundary } from '../components/ErrorBoundary'
 import { StoreProvider } from './store-context'
 import { AuthProvider } from './auth/auth-context'
 import { RequireAuth } from './auth/RequireAuth'
@@ -10,6 +11,8 @@ import { AppShell } from './shell/AppShell'
 import { SessionErrorBoundary } from './pages/SessionErrorBoundary'
 
 const LoginPage = React.lazy(() => import('./pages/LoginPage').then((m) => ({ default: m.LoginPage })))
+const ForgotPasswordPage = React.lazy(() => import('./pages/ForgotPasswordPage').then((m) => ({ default: m.ForgotPasswordPage })))
+const ResetPasswordPage = React.lazy(() => import('./pages/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage })))
 const HomePage = React.lazy(() => import('./pages/HomePage').then((m) => ({ default: m.HomePage })))
 const SessionsPage = React.lazy(() => import('./pages/SessionsPage').then((m) => ({ default: m.SessionsPage })))
 const ProfilePage = React.lazy(() => import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })))
@@ -45,12 +48,15 @@ const SessionAuditPage = React.lazy(() => import('./pages/session/SessionAuditPa
 
 export function App() {
   return (
+    <ErrorBoundary>
     <AuthProvider>
       <StoreProvider>
         <ToastsProvider>
           <React.Suspense fallback={<div className="px-container-padding py-6 text-sm text-on-surface-variant">טוען…</div>}>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
 
               <Route
                 element={
@@ -104,5 +110,6 @@ export function App() {
         </ToastsProvider>
       </StoreProvider>
     </AuthProvider>
+    </ErrorBoundary>
   )
 }

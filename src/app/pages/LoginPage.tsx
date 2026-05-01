@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ListChecks, Spade, UsersRound } from 'lucide-react'
 
 import { Button } from '../../components/ui/button'
@@ -184,13 +184,23 @@ export function LoginPage() {
                     />
                   </Button>
                   {enabled ? (
-                    <button
-                      type="button"
-                      onClick={() => setIsSignUp(!isSignUp)}
-                      className="w-full text-center text-sm text-zinc-400 hover:text-zinc-200"
-                    >
-                      {isSignUp ? 'כבר יש חשבון? כניסה' : 'אין חשבון? הרשמה'}
-                    </button>
+                    <div className="space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsSignUp(!isSignUp)}
+                        className="w-full text-center text-sm text-zinc-400 hover:text-zinc-200"
+                      >
+                        {isSignUp ? 'כבר יש חשבון? כניסה' : 'אין חשבון? הרשמה'}
+                      </button>
+                      {!isSignUp && (
+                        <Link
+                          to="/forgot-password"
+                          className="block w-full text-center text-xs text-zinc-500 hover:text-zinc-300"
+                        >
+                          שכחת סיסמה?
+                        </Link>
+                      )}
+                    </div>
                   ) : null}
                 </form>
 

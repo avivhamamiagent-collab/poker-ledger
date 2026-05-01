@@ -3,11 +3,15 @@ import { createAuthedClient, createServiceClient } from '../_shared/sb.ts'
 import { sendPushToUsers } from '../_shared/push.ts'
 
 async function findUserIdByEmail(svc: any, email: string): Promise<string | null> {
-  // MVP: scan first 1000 users (fine for small projects)
-  const { data, error } = await svc.auth.admin.listUsers({ page: 1, perPage: 1000 })
+  // Use profiles table (kept in sync via on_auth_user_created trigger).
+  // O(1) indexed lookup, no scanning.
+  const { data, error } = await svc
+    .from('profiles')
+    .select('id')
+    .ilike('email', email)
+    .maybeSingle()
   if (error) throw error
-  const u = (data.users ?? []).find((x: any) => String(x.email ?? '').toLowerCase() === email.toLowerCase())
-  return u?.id ?? null
+  return data?.id ?? null
 }
 
 Deno.serve(async (req) => {

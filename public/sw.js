@@ -1,5 +1,5 @@
 /* Minimal offline cache + Web Push for Poker Ledger */
-const CACHE = 'poker-ledger-v4'
+const CACHE = 'poker-ledger-v5'
 const ASSETS = ['/manifest.webmanifest', '/icon.svg']
 
 self.addEventListener('install', (event) => {
