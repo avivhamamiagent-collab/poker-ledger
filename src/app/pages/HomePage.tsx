@@ -3,6 +3,7 @@ import { CalendarPlus, ChevronLeft, History } from 'lucide-react'
 
 import { createSession, totalBuyins, totalCashouts } from '../../domain/session'
 import { Button } from '../../components/ui/button'
+import { SkeletonList } from '../../components/ui/skeleton'
 import { Card, CardContent } from '../../components/ui/card'
 import { useStore } from '../store-context'
 import { useSessions } from '../hooks/useSessions'
@@ -37,8 +38,8 @@ export function HomePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[50dvh] items-center justify-center">
-        <div className="text-on-surface-variant">טוען…</div>
+      <div className="space-y-5 pb-10">
+        <SkeletonList count={3} />
       </div>
     )
   }

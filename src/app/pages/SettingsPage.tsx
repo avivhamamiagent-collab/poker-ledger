@@ -3,6 +3,7 @@ import { Bell, Database, LogOut, RefreshCw, ShieldCheck, Trash2 } from 'lucide-r
 
 import { Button } from '../../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card'
+import { useConfirm } from '../../components/ui/confirm-dialog'
 import { useToast } from '../../components/ui/use-toast'
 import { getEnv } from '../../config/env'
 import { signOut } from '../auth/auth-context'
@@ -12,6 +13,7 @@ export function SettingsPage() {
   const nav = useNavigate()
   const toast = useToast()
   const env = getEnv()
+  const { confirm, dialog: confirmDialog } = useConfirm()
 
   async function checkConnection() {
     try {
@@ -26,7 +28,11 @@ export function SettingsPage() {
   }
 
   async function clearBrowserCache() {
-    const ok = window.confirm('לנקות cache מקומי של הדפדפן ולרענן את האפליקציה?')
+    const ok = await confirm({
+      title: 'ניקוי Cache',
+      description: 'לנקות את הזמנייה המקומית של הדפדפן ולרענן את האפליקציה?',
+      confirmLabel: 'נקה ורענן',
+    })
     if (!ok) return
     try {
       if ('caches' in window) {
@@ -132,6 +138,7 @@ export function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+      {confirmDialog}
     </div>
   )
 }

@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { ToastsProvider } from '../components/ui/use-toast'
 import { Toaster } from '../components/ui/toaster'
+import { SkeletonList } from '../components/ui/skeleton'
 import { ErrorBoundary } from '../components/ErrorBoundary'
 import { StoreProvider } from './store-context'
 import { AuthProvider } from './auth/auth-context'
@@ -52,7 +53,7 @@ export function App() {
     <AuthProvider>
       <StoreProvider>
         <ToastsProvider>
-          <React.Suspense fallback={<div className="px-container-padding py-6 text-sm text-on-surface-variant">טוען…</div>}>
+          <React.Suspense fallback={<div className="space-y-4 px-4 py-6"><SkeletonList count={3} /></div>}>
             <Routes>
               <Route path="/login" element={<LoginPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />

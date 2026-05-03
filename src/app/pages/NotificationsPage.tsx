@@ -2,6 +2,7 @@ import { BellRing, CheckCircle2, Radio } from 'lucide-react'
 
 import { Button } from '../../components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
+import { Skeleton } from '../../components/ui/skeleton'
 import { useToast } from '../../components/ui/use-toast'
 import { useNotifications } from '../hooks/useNotifications'
 import { useWebPush } from '../push/useWebPush'
@@ -83,7 +84,11 @@ export function NotificationsPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="text-sm text-on-surface-variant">טוען…</div>
+            <div className="space-y-2 py-1">
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-full" />
+              <Skeleton className="h-12 w-3/4" />
+            </div>
           ) : error ? (
             <div className="text-sm text-red-200">{error}</div>
           ) : items.length === 0 ? (
