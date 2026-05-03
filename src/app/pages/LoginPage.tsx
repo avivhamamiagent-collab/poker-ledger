@@ -43,8 +43,15 @@ export function LoginPage() {
         toast.push({ title: 'הכניסה הצליחה', description: 'מעביר אותך לאפליקציה…' })
       }
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err)
-      toast.push({ title: isSignUp ? 'ההרשמה נכשלה' : 'הכניסה נכשלה', description: msg })
+      const raw = err instanceof Error ? err.message : String(err)
+      const msg = hebrewAuthError(raw, isSignUp)
+      // If email is already registered while in signup mode → auto-switch to login
+      if (isSignUp && /already registered|user already exists/i.test(raw)) {
+        setIsSignUp(false)
+        toast.push({ title: 'אימייל כבר רשום', description: 'עברנו למסך הכניסה — הכנס את הסיסמה שלך.' })
+      } else {
+        toast.push({ title: isSignUp ? 'ההרשמה נכשלה' : 'הכניסה נכשלה', description: msg })
+      }
     } finally {
       setLoading(false)
     }
@@ -220,4 +227,20 @@ export function LoginPage() {
       </div>
     </div>
   )
+}
+
+function hebrewAuthError(msg: string, isSignUp: boolean): string {
+  if (/already registered|user already exists/i.test(msg))
+    return 'האימייל הזה כבר רשום. נסה להיכנס עם הסיסמה שלך.'
+  if (/invalid login credentials|invalid password|wrong password/i.test(msg))
+    return 'אימייל או סיסמה שגויים. נסה שנית.'
+  if (/email not confirmed/i.test(msg))
+    return 'יש לאשר את האימייל לפני הכניסה. בדוק את תיבת הדואר שלך.'
+  if (/password should be at least/i.test(msg))
+    return 'הסיסמה חייבת להכיל לפחות 6 תווים.'
+  if (/rate limit|too many requests/i.test(msg))
+    return 'יותר מדי ניסיונות. המתן כמה דקות ונסה שנית.'
+  if (/network|fetch|failed to fetch/i.test(msg))
+    return 'בעיית חיבור לרשת. בדוק את האינטרנט ונסה שנית.'
+  return isSignUp ? `ההרשמה נכשלה: ${msg}` : `הכניסה נכשלה: ${msg}`
 }
